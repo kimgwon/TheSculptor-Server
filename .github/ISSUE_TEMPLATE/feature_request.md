@@ -1,13 +1,13 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: "[Feature] - "
+title: "[feat] - "
 labels: "\U0001F680 Feature"
 assignees: ''
 
 ---
 
-# 🚀 Feature -
+# 🚀 Feat -
 
 ### 📝 Description
 ---
