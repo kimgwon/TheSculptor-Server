@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,6 +40,9 @@ public class Stones {
     private LocalDateTime created_at;
 
     private int stone_like;
+
+    @OneToMany(mappedBy = "stones")
+    private List<Statuses> statuses;
 
     /*
     //갱신일
