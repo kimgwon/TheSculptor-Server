@@ -1,4 +1,4 @@
-package Backend.sculptor.Member.Entity;
+package Backend.sculptor.User.Entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

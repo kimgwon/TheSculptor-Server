@@ -1,6 +1,6 @@
-package Backend.sculptor.Member.Repository;
+package Backend.sculptor.User.Repository;
 
-import Backend.sculptor.Member.Entity.Users;
+import Backend.sculptor.User.Entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
