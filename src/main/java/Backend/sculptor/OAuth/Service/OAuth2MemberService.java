@@ -29,6 +29,8 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         OAuth2MemberInfo memberInfo = null;
         System.out.println("userRequest = " + userRequest.getClientRegistration().getRegistrationId());
+        String accessToken = userRequest.getAccessToken().getTokenValue();
+        System.out.println("accessToken = " + accessToken);
 
         if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
