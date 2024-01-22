@@ -1,5 +1,6 @@
 package Backend.sculptor.Stone.Entity;
 
+import Backend.sculptor.Comment.Entitiy.Comment;
 import Backend.sculptor.User.Entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,6 +48,9 @@ public class Stone {
 
     @OneToMany(mappedBy = "stone")
     private List<StoneItem> stoneItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "stone")
+    private List<Comment> comments = new ArrayList<>();
 
     /*
     //갱신일
