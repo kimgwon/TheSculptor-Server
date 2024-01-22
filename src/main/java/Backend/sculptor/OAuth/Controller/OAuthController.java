@@ -1,6 +1,8 @@
 package Backend.sculptor.OAuth.Controller;
 
+import Backend.sculptor.OAuth.Annotation.CurrentUser;
 import Backend.sculptor.OAuth.PrincipalDetails;
+import Backend.sculptor.User.Entity.SessionUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
