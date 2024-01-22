@@ -7,13 +7,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
 @Getter
-public class Stones {
+public class Stone {
 
     @Id @GeneratedValue
     @Column(name = "stone_id")
@@ -42,7 +43,10 @@ public class Stones {
     private int stone_like;
 
     @OneToMany(mappedBy = "stones")
-    private List<Statuses> statuses;
+    private List<Status> statuses;
+
+    @OneToMany(mappedBy = "stone")
+    private List<StoneItem> stoneItems = new ArrayList<>();
 
     /*
     //갱신일

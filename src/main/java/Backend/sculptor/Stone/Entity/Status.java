@@ -10,14 +10,14 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Statuses {
+public class Status {
     @Id @GeneratedValue
     @Column(name = "status_id")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stone_id")
-    private Stones stones;
+    private Stone stones;
 
     @Enumerated(EnumType.STRING)
     private StoneStatus stone_status; //enum
