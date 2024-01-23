@@ -52,6 +52,10 @@ public class Stone {
     @OneToMany(mappedBy = "stone")
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name="achieve_id")
+    private Achieve achieve;
+
     /*
     //갱신일
     private LocalDateTime updated_at;
