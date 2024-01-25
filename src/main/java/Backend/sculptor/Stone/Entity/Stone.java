@@ -1,5 +1,6 @@
 package Backend.sculptor.Stone.Entity;
 
+import Backend.sculptor.Comment.Entitiy.Comment;
 import Backend.sculptor.User.Entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -7,12 +8,14 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
 @Getter
-public class Stones {
+public class Stone {
 
     @Id @GeneratedValue
     @Column(name = "stone_id")
@@ -39,6 +42,19 @@ public class Stones {
     private LocalDateTime created_at;
 
     private int stone_like;
+
+    @OneToMany(mappedBy = "stones")
+    private List<Status> statuses;
+
+    @OneToMany(mappedBy = "stone")
+    private List<StoneItem> stoneItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "stone")
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name="achieve_id")
+    private Achieve achieve;
 
     /*
     //갱신일
