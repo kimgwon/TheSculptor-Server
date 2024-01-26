@@ -1,5 +1,6 @@
 package Backend.sculptor.User.Entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -21,7 +22,10 @@ public class Users {
     private String role;
     private String nickname;
     private String profile_image;
-    private Boolean is_public;
+
+    @Column(nullable = false)
+    private Boolean is_public = true;
+
     private UUID represent_stone_id;
 
     @Builder
