@@ -7,6 +7,7 @@ import Backend.sculptor.User.Entity.Users;
 import Backend.sculptor.User.Repository.UserRepository;
 import Backend.sculptor.OAuth.MemberInfo.OAuth2MemberInfo;
 import Backend.sculptor.OAuth.PrincipalDetails;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,9 +29,9 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         OAuth2MemberInfo memberInfo = null;
-        System.out.println("userRequest = " + userRequest.getClientRegistration().getRegistrationId());
+
         String accessToken = userRequest.getAccessToken().getTokenValue();
-        System.out.println("accessToken = " + accessToken);
+        //System.out.println("accessToken = " + accessToken);
 
         if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
@@ -44,7 +45,6 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         String providerId = memberInfo.getProviderId();
         String nickname = provider + "_" + providerId; //중복이 발생하지 않도록 provider와 providerId를 조합
         String username = memberInfo.getName();
-        System.out.println("memberInfo = " + memberInfo.getName());
 
         //String email = memberInfo.getEmail();
         String profile_image = memberInfo.getProfileImage();
@@ -67,7 +67,6 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         }
 
         httpSession.setAttribute("user", new SessionUser(users));
-        System.out.println("users = " + users.getNickname() + users.getName());
         return new PrincipalDetails(users, oAuth2User.getAttributes());
     }
 }
