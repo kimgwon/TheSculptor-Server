@@ -31,4 +31,12 @@ public class Users {
         this.nickname = nickname;
         this.profile_image = profile_image;
     }
+
+    public void setNickname(String newNickname) {
+        this.nickname = newNickname;
+    }
+
+    public void setIs_public(Boolean isPublic) {
+        this.is_public = isPublic;
+    }
 }
