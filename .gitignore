@@ -177,3 +177,4 @@ Temporary Items
 
 *.bin
 *.lock
+.gradle/
