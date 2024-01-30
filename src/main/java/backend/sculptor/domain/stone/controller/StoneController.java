@@ -18,6 +18,7 @@ public class StoneController {
 
     private final StoneService stoneService;
 
+    //[공방] 돌 전체 반환
     @GetMapping("/stones")
     public APIBody<List<StoneDTO>> getStones(@CurrentUser SessionUser user, @RequestParam(required = false) String category){
         List<StoneDTO> stones = stoneService.getStonesByCategory(user.getName(),category);
