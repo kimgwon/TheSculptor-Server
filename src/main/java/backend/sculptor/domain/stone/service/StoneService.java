@@ -1,8 +1,8 @@
-package Backend.sculptor.Stone.Service;
+package backend.sculptor.domain.stone.service;
 
-import Backend.sculptor.Stone.DTO.StoneDTO;
-import Backend.sculptor.Stone.Entity.Stone;
-import Backend.sculptor.Stone.Repository.StoneRepository;
+import backend.sculptor.domain.stone.dto.StoneDTO;
+import backend.sculptor.domain.stone.entity.Stone;
+import backend.sculptor.domain.stone.repository.StoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

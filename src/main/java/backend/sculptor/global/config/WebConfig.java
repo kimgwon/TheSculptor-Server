@@ -1,6 +1,6 @@
 package backend.sculptor.global.config;
 
-import backend.sculptor.global.auth.annotation.CurrentUserArgumentResolver;
+import backend.sculptor.global.oauth.annotation.CurrentUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

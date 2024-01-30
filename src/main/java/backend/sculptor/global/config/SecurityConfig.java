@@ -1,8 +1,8 @@
 package backend.sculptor.global.config;
 
-import backend.sculptor.global.auth.handler.CustomLogoutSuccessHandler;
-import backend.sculptor.global.auth.handler.CustomAuthenticationSuccessHandler;
-import backend.sculptor.global.auth.service.OAuth2MemberService;
+import backend.sculptor.global.oauth.handler.CustomLogoutSuccessHandler;
+import backend.sculptor.global.oauth.handler.CustomAuthenticationSuccessHandler;
+import backend.sculptor.global.oauth.service.OAuth2MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

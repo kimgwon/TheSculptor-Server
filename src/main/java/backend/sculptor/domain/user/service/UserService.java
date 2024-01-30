@@ -16,7 +16,7 @@ public class UserService {
     }
 
     public void updatePublic(Users findUser, Boolean isPublic) {
-        findUser.setIs_public(isPublic);
+        findUser.setIsPublic(isPublic);
         userRepository.save(findUser);
     }
 

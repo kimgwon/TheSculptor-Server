@@ -1,10 +1,10 @@
-package backend.sculptor.global.auth.service;
+package backend.sculptor.global.oauth.service;
 
 import backend.sculptor.domain.user.entity.SessionUser;
-import backend.sculptor.global.auth.PrincipalDetails;
-import backend.sculptor.global.auth.memberInfo.GoogleMemberInfo;
-import backend.sculptor.global.auth.memberInfo.KakaoMemberInfo;
-import backend.sculptor.global.auth.memberInfo.OAuth2MemberInfo;
+import backend.sculptor.global.oauth.PrincipalDetails;
+import backend.sculptor.global.oauth.memberInfo.GoogleMemberInfo;
+import backend.sculptor.global.oauth.memberInfo.KakaoMemberInfo;
+import backend.sculptor.global.oauth.memberInfo.OAuth2MemberInfo;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -58,7 +58,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
                     .name(username)
                     .role(role)
                     .nickname(nickname)
-                    .profile_image(profile_image)
+                    .profileImage(profile_image)
                     .build();
             userRepository.save(users);
         } else {

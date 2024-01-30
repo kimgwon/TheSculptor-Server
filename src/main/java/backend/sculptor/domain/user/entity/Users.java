@@ -21,26 +21,26 @@ public class Users {
     private String name;
     private String role;
     private String nickname;
-    private String profile_image;
+    private String profileImage;
 
     @Column(nullable = false)
-    private Boolean is_public = true;
+    private Boolean isPublic = true;
 
-    private UUID represent_stone_id;
+    private UUID representStoneId;
 
     @Builder
-    public Users(String name, String role, String nickname, String profile_image) {
+    public Users(String name, String role, String nickname, String profileImage) {
         this.name = name;
         this.role = role;
         this.nickname = nickname;
-        this.profile_image = profile_image;
+        this.profileImage = profileImage;
     }
 
     public void setNickname(String newNickname) {
         this.nickname = newNickname;
     }
 
-    public void setIs_public(Boolean isPublic) {
-        this.is_public = isPublic;
+    public void setIsPublic(Boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

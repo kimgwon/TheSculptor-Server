@@ -1,4 +1,4 @@
-package backend.sculptor.global.auth.annotation;
+package backend.sculptor.global.oauth.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

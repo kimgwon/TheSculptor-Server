@@ -1,13 +1,10 @@
-package Backend.sculptor.Stone.Repository;
+package backend.sculptor.domain.stone.repository;
 
-import Backend.sculptor.Stone.Entity.Stone;
-import Backend.sculptor.User.Entity.Users;
+import backend.sculptor.domain.stone.entity.Stone;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface StoneRepository extends JpaRepository<Stone, Long> {

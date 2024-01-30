@@ -5,9 +5,7 @@ import backend.sculptor.domain.user.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,8 +18,8 @@ public class Comment {
     private UUID id;
 
     private String content;
-    private LocalDateTime write_at;
-    private int comment_like;
+    private LocalDateTime writeAt;
+    private int commentLike;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="stone_id")

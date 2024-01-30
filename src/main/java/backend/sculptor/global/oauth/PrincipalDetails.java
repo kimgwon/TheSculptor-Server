@@ -1,4 +1,4 @@
-package backend.sculptor.global.auth;
+package backend.sculptor.global.oauth;
 
 import backend.sculptor.domain.user.entity.Users;
 import lombok.Getter;

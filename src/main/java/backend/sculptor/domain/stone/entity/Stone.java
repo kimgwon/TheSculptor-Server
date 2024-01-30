@@ -36,12 +36,12 @@ public class Stone {
 
     private int powder;
 
-    private LocalDateTime start_date;
-    private LocalDateTime final_date;
+    private LocalDateTime startDate;
+    private LocalDateTime finalDate;
     @CreationTimestamp
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
-    private int stone_like;
+    private int stoneLike;
 
     @OneToMany(mappedBy = "stones")
     private List<Status> statuses;

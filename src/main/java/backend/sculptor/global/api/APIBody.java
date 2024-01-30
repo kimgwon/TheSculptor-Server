@@ -1,4 +1,4 @@
-package Backend.sculptor.APIResponse;
+package backend.sculptor.global.api;
 
 import lombok.Getter;
 

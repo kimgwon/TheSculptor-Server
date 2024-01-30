@@ -1,22 +1,16 @@
-package Backend.sculptor.Stone.Controller;
+package backend.sculptor.domain.stone.controller;
 
-import Backend.sculptor.APIResponse.APIBody;
-import Backend.sculptor.OAuth.Annotation.CurrentUser;
-import Backend.sculptor.Stone.DTO.StoneDTO;
-import Backend.sculptor.Stone.Entity.Stone;
-import Backend.sculptor.Stone.Service.StoneService;
-import Backend.sculptor.User.Entity.SessionUser;
+import backend.sculptor.domain.stone.dto.StoneDTO;
+import backend.sculptor.domain.stone.service.StoneService;
+import backend.sculptor.domain.user.entity.SessionUser;
+import backend.sculptor.global.api.APIBody;
+import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor

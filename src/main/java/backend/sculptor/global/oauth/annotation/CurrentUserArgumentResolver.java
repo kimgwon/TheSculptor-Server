@@ -1,4 +1,4 @@
-package backend.sculptor.global.auth.annotation;
+package backend.sculptor.global.oauth.annotation;
 
 import backend.sculptor.domain.user.entity.SessionUser;
 import jakarta.servlet.http.HttpSession;

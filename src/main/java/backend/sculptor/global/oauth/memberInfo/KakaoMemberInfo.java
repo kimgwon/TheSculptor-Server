@@ -1,4 +1,4 @@
-package backend.sculptor.global.auth.memberInfo;
+package backend.sculptor.global.oauth.memberInfo;
 
 import java.util.Map;
 

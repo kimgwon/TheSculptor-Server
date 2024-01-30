@@ -1,4 +1,4 @@
-package backend.sculptor.global.auth.handler;
+package backend.sculptor.global.oauth.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

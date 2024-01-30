@@ -2,7 +2,7 @@ package backend.sculptor.domain.user.controller;
 
 import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.domain.user.entity.Users;
-import backend.sculptor.global.auth.annotation.CurrentUser;
+import backend.sculptor.global.oauth.annotation.CurrentUser;
 import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,9 +37,9 @@ public class UserController {
 
             userData.put("user_id", findUser.getId());
             userData.put("user_name", findUser.getName());
-            userData.put("profile_image", findUser.getProfile_image());
+            userData.put("profile_image", findUser.getProfileImage());
             userData.put("nickname", findUser.getNickname());
-            userData.put("is_public", findUser.getIs_public());
+            userData.put("is_public", findUser.getIsPublic());
 
             response.put("code", 200);
             response.put("message", "마이페이지 조회 성공");

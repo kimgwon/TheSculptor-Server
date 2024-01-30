@@ -17,6 +17,6 @@ public class Item {
     @Column(name = "item_id")
     private UUID id;
 
-    private String item_name;
-    private int item_price;
+    private String itemName;
+    private int itemPrice;
 }
