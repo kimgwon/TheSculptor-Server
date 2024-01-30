@@ -7,11 +7,7 @@ import Backend.sculptor.User.Repository.UserRepository;
 import Backend.sculptor.User.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +31,7 @@ public class UserController {
         }
 
         try {
-            Users findUser = userRepository.findByName(user.getName()).orElseThrow(NoSuchElementException::new);
+            Users findUser = userRepository.findById(user.getId()).orElseThrow(NoSuchElementException::new);
 
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> userData = new HashMap<>();
@@ -132,4 +128,47 @@ public class UserController {
             return ResponseEntity.status(404).body(errorResponse);
         }
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser(@CurrentUser SessionUser user) {
+        if (user == null) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("code", 401);
+            errorResponse.put("message", "사용자 정보가 없습니다.");
+            errorResponse.put("data", null);
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        try {
+            Users findUser = userRepository.findByName(user.getName()).orElseThrow(NoSuchElementException::new);
+            userService.deleteUser(findUser);
+
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("code", 200);
+            response.put("message", "회원 탈퇴 성공");
+            response.put("data", null);
+
+            return ResponseEntity.ok(response);
+
+        } catch (NoSuchElementException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("code", 404);
+            errorResponse.put("message", "해당 사용자가 존재하지 않습니다.");
+            errorResponse.put("data", null);
+
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
+//    @GetMapping("/mypage/purchases")
+//    public ResponseEntity<?> purchaseList(@CurrentUser SessionUser user) {
+//        if (user == null) {
+//            Map<String, Object> errorResponse = new HashMap<>();
+//            errorResponse.put("code", 401);
+//            errorResponse.put("message", "사용자 정보가 없습니다.");
+//            errorResponse.put("data", null);
+//            return ResponseEntity.badRequest().body(errorResponse);
+//        }
+//    }
 }

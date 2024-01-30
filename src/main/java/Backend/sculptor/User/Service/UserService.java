@@ -19,4 +19,8 @@ public class UserService {
         findUser.setIs_public(isPublic);
         userRepository.save(findUser);
     }
+
+    public void deleteUser(Users findUser) {
+        userRepository.delete(findUser);
+    }
 }
