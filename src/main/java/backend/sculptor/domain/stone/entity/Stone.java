@@ -27,9 +27,9 @@ public class Stone {
 
     //아직 유저 엔티티에 매핑안함. @OneToMany 안함
 
-    private String stone_name;
-    private String stone_goal;
-    private String one_comment;
+    private String stoneName;
+    private String stoneGoal;
+    private String oneComment;
 
     @Enumerated(EnumType.STRING)
     private Category category; //enum
