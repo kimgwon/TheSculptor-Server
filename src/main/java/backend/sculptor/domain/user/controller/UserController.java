@@ -1,20 +1,18 @@
 package backend.sculptor.domain.user.controller;
 
+import backend.sculptor.global.auth.annotation.CurrentUser;
 import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.domain.user.entity.Users;
-import backend.sculptor.global.auth.annotation.CurrentUser;
 import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,16 +31,16 @@ public class UserController {
         }
 
         try {
-            Users findUser = userRepository.findByName(user.getName()).orElseThrow(NoSuchElementException::new);
+            Users findUser = userRepository.findById(user.getId()).orElseThrow(NoSuchElementException::new);
 
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> userData = new HashMap<>();
 
             userData.put("user_id", findUser.getId());
             userData.put("user_name", findUser.getName());
-            userData.put("profile_image", findUser.getProfileImage());
+            userData.put("profile_image", findUser.getProfile_image());
             userData.put("nickname", findUser.getNickname());
-            userData.put("is_public", findUser.getIsPublic());
+            userData.put("is_public", findUser.getIs_public());
 
             response.put("code", 200);
             response.put("message", "마이페이지 조회 성공");
@@ -130,4 +128,47 @@ public class UserController {
             return ResponseEntity.status(404).body(errorResponse);
         }
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteUser(@CurrentUser SessionUser user) {
+        if (user == null) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("code", 401);
+            errorResponse.put("message", "사용자 정보가 없습니다.");
+            errorResponse.put("data", null);
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        try {
+            Users findUser = userRepository.findByName(user.getName()).orElseThrow(NoSuchElementException::new);
+            userService.deleteUser(findUser);
+
+            Map<String, Object> response = new HashMap<>();
+
+            response.put("code", 200);
+            response.put("message", "회원 탈퇴 성공");
+            response.put("data", null);
+
+            return ResponseEntity.ok(response);
+
+        } catch (NoSuchElementException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("code", 404);
+            errorResponse.put("message", "해당 사용자가 존재하지 않습니다.");
+            errorResponse.put("data", null);
+
+            return ResponseEntity.status(404).body(errorResponse);
+        }
+    }
+
+//    @GetMapping("/mypage/purchases")
+//    public ResponseEntity<?> purchaseList(@CurrentUser SessionUser user) {
+//        if (user == null) {
+//            Map<String, Object> errorResponse = new HashMap<>();
+//            errorResponse.put("code", 401);
+//            errorResponse.put("message", "사용자 정보가 없습니다.");
+//            errorResponse.put("data", null);
+//            return ResponseEntity.badRequest().body(errorResponse);
+//        }
+//    }
 }
