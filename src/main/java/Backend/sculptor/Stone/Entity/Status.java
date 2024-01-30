@@ -20,8 +20,8 @@ public class Status {
     private Stone stones;
 
     @Enumerated(EnumType.STRING)
-    private StoneStatus stone_status; //enum
+    private StoneStatus stoneStatus; //enum
 
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
 }

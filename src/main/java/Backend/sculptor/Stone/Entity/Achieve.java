@@ -20,7 +20,7 @@ public class Achieve {
     private Stone stone;
 
     @Enumerated(EnumType.STRING)
-    private AchieveStatus achieve_status;
+    private AchieveStatus achieveStatus;
 
     private LocalDateTime date;
 

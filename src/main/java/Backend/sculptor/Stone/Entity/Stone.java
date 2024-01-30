@@ -27,21 +27,21 @@ public class Stone {
 
     //아직 유저 엔티티에 매핑안함. @OneToMany 안함
 
-    private String stone_name;
-    private String stone_goal;
-    private String one_comment;
+    private String stoneName;
+    private String stoneGoal;
+    private String oneComment;
 
     @Enumerated(EnumType.STRING)
     private Category category; //enum
 
     private int powder;
 
-    private LocalDateTime start_date;
-    private LocalDateTime final_date;
+    private LocalDateTime startDate;
+    private LocalDateTime finalDate;
     @CreationTimestamp
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
-    private int stone_like;
+    private int stoneLike;
 
     @OneToMany(mappedBy = "stones")
     private List<Status> statuses;
