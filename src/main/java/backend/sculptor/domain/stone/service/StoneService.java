@@ -28,9 +28,9 @@ public class StoneService {
         String categoryName = stone.getCategory().toString();
         return new StoneDTO(
                 stone.getId(),
-                stone.getStone_name(),
+                stone.getStoneName(),
                 categoryName,
-                stone.getStone_goal()
+                stone.getStoneGoal()
         );
     }
 }
