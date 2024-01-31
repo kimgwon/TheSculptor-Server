@@ -1,13 +1,13 @@
 package backend.sculptor.domain.user.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import backend.sculptor.domain.stone.entity.Stone;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +27,9 @@ public class Users {
     private Boolean isPublic = true;
 
     private UUID representStoneId;
+
+    @OneToMany(mappedBy="users")
+    private final List<Stone> stones = new ArrayList<>();
 
     @Builder
     public Users(String name, String role, String nickname, String profileImage) {
