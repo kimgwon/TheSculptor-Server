@@ -3,6 +3,7 @@ package backend.sculptor.domain.stone.entity;
 import backend.sculptor.domain.comment.entity.Comment;
 import backend.sculptor.domain.user.entity.Users;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -59,6 +60,13 @@ public class Stone {
     private LocalDateTime updated_at;
      */
 
+    @Builder
+    public Stone(String stoneName, Category category, String stoneGoal, LocalDateTime startDate){
+        this.stoneName = stoneName;
+        this.category = category;
+        this.stoneGoal = stoneGoal;
+        this.startDate = startDate;
+    }
 
 
 

@@ -1,15 +1,15 @@
 package backend.sculptor.domain.stone.controller;
 
+import backend.sculptor.domain.stone.dto.StoneCreateRequest;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Category;
+import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class StoneController {
 
     private final StoneService stoneService;
 
-    //[공방] 돌 전체 반환
+    //[GET] 돌 전체 조회
     @GetMapping("/stones")
     public APIBody<List<StoneListDTO>> getStones(@CurrentUser SessionUser user, @RequestParam(required = false) Category category){
         if(user == null){
@@ -37,6 +37,14 @@ public class StoneController {
             //기타 서버 오류
             return APIBody.of(500, "서버 오류 발생"+e.getMessage(),null);
         }
+    }
+
+    //[POST] 돌 생성
+    @PostMapping("/workplace/create")
+    public APIBody<StoneListDTO> createStone(@RequestBody StoneCreateRequest request){
+        StoneListDTO newStone = stoneService.createStone(request);
+        return APIBody.of(200, "돌 생성 성공",newStone);
+
     }
 
 }
