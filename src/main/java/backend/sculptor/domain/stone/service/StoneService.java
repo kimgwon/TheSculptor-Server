@@ -1,6 +1,7 @@
 package backend.sculptor.domain.stone.service;
 
 import backend.sculptor.domain.stone.dto.StoneListDTO;
+import backend.sculptor.domain.stone.entity.Category;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,12 +19,12 @@ public class StoneService {
     private final StoneRepository stoneRepository;
 
     //돌 전체 반환
-    public List<StoneListDTO> getStonesByCategory(String userId, String category) {
+    public List<StoneListDTO> getStonesByCategory(UUID userId, Category category) {
         List<Stone> stones;
-        if (category == null || category.isEmpty()) {
-            stones = stoneRepository.findByUserId(userId);
+        if (category == null) {
+            stones = stoneRepository.findByUsersId(userId);
         } else {
-            stones = stoneRepository.findByUserIdAndCategory(userId, category);
+            stones = stoneRepository.findByUsersIdAndCategory(userId, category);
         }
         return stones.stream().map(this::convertToStoneDTO).collect(Collectors.toList());
     }

@@ -25,8 +25,6 @@ public class Stone {
     @JoinColumn(name = "user_id")
     private Users users;
 
-    //아직 유저 엔티티에 매핑안함. @OneToMany 안함
-
     private String stoneName;
     private String stoneGoal;
     private String oneComment;
