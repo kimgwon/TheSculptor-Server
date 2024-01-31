@@ -1,13 +1,12 @@
 package backend.sculptor.domain.stone.service;
 
-import backend.sculptor.domain.stone.dto.StoneDTO;
+import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +17,7 @@ public class StoneService {
     private final StoneRepository stoneRepository;
 
     //돌 전체 반환
-    public List<StoneDTO> getStonesByCategory(String userId, String category) {
+    public List<StoneListDTO> getStonesByCategory(String userId, String category) {
         List<Stone> stones;
         if (category == null || category.isEmpty()) {
             stones = stoneRepository.findByUserId(userId);
@@ -29,15 +28,17 @@ public class StoneService {
     }
 
     //DTO 변환
-    private StoneDTO convertToStoneDTO(Stone stone) {
+    private StoneListDTO convertToStoneDTO(Stone stone) {
         // Stone 엔티티를 StoneDTO로 변환하는 로직
         String categoryName = stone.getCategory().toString();
-        return new StoneDTO(
+        String dDay = calculateDate(stone.getStartDate().toLocalDate());
+        return new StoneListDTO(
                 stone.getId(),
                 stone.getStoneName(),
                 categoryName,
                 stone.getStoneGoal(),
-                stone.getStartDate()
+                stone.getStartDate(),
+                dDay
         );
     }
 
