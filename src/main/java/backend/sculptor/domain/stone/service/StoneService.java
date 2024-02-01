@@ -33,6 +33,7 @@ public class StoneService {
     }
 
     //돌 생성
+    @Transactional
     public StoneListDTO createStone(StoneCreateRequest request){
         Stone stone = Stone.builder()
                 .stoneName(request.getStoneName())
