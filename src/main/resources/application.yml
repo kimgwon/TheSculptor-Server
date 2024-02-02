@@ -1,4 +1,4 @@
-spring:
+ spring:
   profiles:
     include: oauth
   h2:

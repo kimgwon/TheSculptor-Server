@@ -11,6 +11,7 @@ public class SessionUser {
     private String profileImage;
     private UUID id;
 
+
     public SessionUser(Users user) {
         this.id = user.getId();
         this.name = user.getName();
