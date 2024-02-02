@@ -38,13 +38,27 @@ public class StoneController {
             return APIBody.of(500, "서버 오류 발생"+e.getMessage(),null);
         }
     }
-
-    //[POST] 돌 생성
+    //[POST] 돌 생성하기
     @PostMapping("/workplace/create")
-    public APIBody<StoneListDTO> createStone(@RequestBody StoneCreateRequest request){
-        StoneListDTO newStone = stoneService.createStone(request);
-        return APIBody.of(200, "돌 생성 성공",newStone);
+    public APIBody<StoneListDTO> createStone(@RequestBody StoneCreateRequest request) {
+        try {
+            //유효성 검사
+            if (request == null || !request.isValid()) {
+                return APIBody.of(400, "잘못된 요청 데이터입니다.", null);
+            }
+            StoneListDTO newStone = stoneService.createStone(request);
+            if (newStone == null) {
 
+                //돌 생성 실패 (서비스 로직 내 실패)
+                return APIBody.of(500, "돌을 생성하지 못했습니다.", null);
+            }
+            //돌 생성 성공
+            return APIBody.of(200, "돌 생성 성공", newStone);
+        } catch (Exception e) {
+            //기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
     }
+
 
 }

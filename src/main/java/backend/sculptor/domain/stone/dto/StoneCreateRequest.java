@@ -20,4 +20,12 @@ public class StoneCreateRequest {
     private Category category;
     private String stoneGoal;
     private LocalDateTime startDate;
+
+    //돌 생성 유효성 검사 로직
+    public boolean isValid() {
+        return stoneName != null && !stoneName.trim().isEmpty() &&
+                category != null &&
+                stoneGoal != null && !stoneGoal.trim().isEmpty() &&
+                startDate != null;
+    }
 }
