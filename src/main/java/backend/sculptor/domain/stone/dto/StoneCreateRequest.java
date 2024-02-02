@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @JsonFormat
 public class StoneCreateRequest {
-    //private UUID stoneId;
+    private UUID stoneId;
     private String stoneName;
     private Category category;
     private String stoneGoal;

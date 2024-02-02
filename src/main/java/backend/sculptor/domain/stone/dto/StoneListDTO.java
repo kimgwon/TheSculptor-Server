@@ -17,7 +17,6 @@ public class StoneListDTO {
     private UUID stoneId;
     private String stoneName;
     private Category category;
-    private String stoneGoal;
     private LocalDateTime startDate;
     private String dDay;
 

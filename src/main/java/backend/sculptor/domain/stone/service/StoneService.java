@@ -53,7 +53,6 @@ public class StoneService {
                 stone.getId(),
                 stone.getStoneName(),
                 stone.getCategory(),
-                stone.getStoneGoal(),
                 stone.getStartDate(),
                 dDay
         );
