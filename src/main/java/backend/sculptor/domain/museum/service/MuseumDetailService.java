@@ -1,3 +1,4 @@
+/*
 package backend.sculptor.domain.museum.service;
 
 import backend.sculptor.domain.comment.entity.Comment;
@@ -75,3 +76,4 @@ public class MuseumDetailService {
                 .collect(Collectors.toList());
     }
 }
+*/

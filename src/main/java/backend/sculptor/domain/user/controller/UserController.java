@@ -1,3 +1,4 @@
+/*
 package backend.sculptor.domain.user.controller;
 
 import backend.sculptor.domain.user.entity.SessionUser;
@@ -171,3 +172,4 @@ public class UserController {
 //        }
 //    }
 }
+*/

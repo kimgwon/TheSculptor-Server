@@ -1,3 +1,4 @@
+/*
 package backend.sculptor.domain.museum.controller;
 
 import backend.sculptor.domain.museum.dto.Museum;
@@ -45,3 +46,5 @@ public class MuseumController {
     }
 
 }
+
+ */
