@@ -18,4 +18,6 @@ public interface AchieveRepository extends JpaRepository<Achieve, UUID> {
 
     //달성률 계산
     List<Achieve> findAllByStoneIdAndDateBetweenAndAchieveStatus(UUID stoneId, LocalDateTime startDate, LocalDateTime endDate, AchieveStatus achieveStatus);
+
+    List<Achieve> findByStoneId(UUID stoneId);
 }

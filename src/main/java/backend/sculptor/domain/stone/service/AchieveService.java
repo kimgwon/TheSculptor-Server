@@ -1,8 +1,6 @@
 package backend.sculptor.domain.stone.service;
 
-import backend.sculptor.domain.stone.dto.SculptorResultDTO;
-import backend.sculptor.domain.stone.dto.StoneListDTO;
-import backend.sculptor.domain.stone.dto.StoneSculptRequest;
+import backend.sculptor.domain.stone.dto.*;
 import backend.sculptor.domain.stone.entity.Achieve;
 import backend.sculptor.domain.stone.entity.AchieveStatus;
 import backend.sculptor.domain.stone.entity.Stone;
@@ -17,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +38,30 @@ public class AchieveService {
                 achieve.getStone().getPowder()
         );
     }
+
+    //AchieveDTO 변환
+    private AchieveDTO convertToAchieveDTO(Achieve achieve) {
+        // Achieve 엔티티를 AchieveDTO로 변환하는 로직
+        return new AchieveDTO(
+                achieve.getId(),
+                achieve.getDate(),
+                achieve.getAchieveStatus());
+    }
+
+    //돌 달성현황 전체 조회
+    @Transactional(readOnly = true)
+    public StoneAchievesListDTO findAllAchievesByStoneId(UUID stoneId) {
+        List<Achieve> achieves = achieveRepository.findByStoneId(stoneId);
+
+        List<AchieveDTO> achieveDTOs = achieves.stream()
+                .map(this::convertToAchieveDTO)
+                .collect(Collectors.toList());
+
+        // Stone 정보와 AchieveDTO 리스트를 포함하는 StoneAchievesDTO 반환
+        return new StoneAchievesListDTO(stoneId, achieveDTOs);
+    }
+
+
 
     //돌 조각_달성 현황 기록
     @Transactional

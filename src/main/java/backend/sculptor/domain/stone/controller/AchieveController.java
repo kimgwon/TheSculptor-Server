@@ -1,6 +1,7 @@
 package backend.sculptor.domain.stone.controller;
 
 import backend.sculptor.domain.stone.dto.SculptorResultDTO;
+import backend.sculptor.domain.stone.dto.StoneAchievesListDTO;
 import backend.sculptor.domain.stone.dto.StoneSculptRequest;
 import backend.sculptor.domain.stone.service.AchieveService;
 import backend.sculptor.domain.user.entity.SessionUser;
@@ -39,4 +40,22 @@ public class AchieveController {
         }
 
     }
+
+    //[GET] 돌 달성현황 전체 조회
+    @GetMapping("/workplace/stones/{stoneId}/achieves")
+    public APIBody<StoneAchievesListDTO> getAllAchievesByStoneId(@CurrentUser SessionUser user, @PathVariable UUID stoneId) {
+        if (user == null) {
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            StoneAchievesListDTO stoneAchieves = achieveService.findAllAchievesByStoneId(stoneId);
+            if (stoneAchieves == null || stoneAchieves.getAchieves().isEmpty()) {
+                return APIBody.of(404, "해당 돌에 대한 달성 기록이 없습니다.", null);
+            }
+            return APIBody.of(200, "달성 기록 조회 성공", stoneAchieves);
+        } catch (Exception e) {
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
+    }
 }
+
