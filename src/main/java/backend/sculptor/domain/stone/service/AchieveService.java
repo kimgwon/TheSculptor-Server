@@ -43,6 +43,12 @@ public class AchieveService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
+        //현재 날짜 기준 미래 시점 요청은 예외처리
+        LocalDate today = LocalDate.now();
+        if (request.getDate().isAfter(today)) {
+            throw new IllegalArgumentException("미래 날짜로 달성 현황을 기록할 수 없습니다.");
+        }
+
         Stone stone = stoneRepository.findById(stoneId)
                 .orElseThrow(() -> new RuntimeException("돌을 찾을 수 없습니다."));
 
