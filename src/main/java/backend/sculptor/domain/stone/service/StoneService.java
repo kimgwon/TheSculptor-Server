@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class StoneService {
     private final StoneRepository stoneRepository;
     private final UserRepository userRepository;
+    private final AchieveService achieveService;
 
     //돌 전체 조회
     public List<StoneListDTO> getStonesByCategory(UUID userId, Category category) {
@@ -44,6 +45,15 @@ public class StoneService {
     public StoneListDTO createStone(UUID userId,StoneCreateRequest request){
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 중복 돌 검사
+        Optional<Stone> existingStone = stoneRepository.findByUsersIdAndStoneNameAndCategoryAndStoneGoalAndStartDate(
+                userId, request.getStoneName(), request.getCategory(), request.getStoneGoal(), request.getStartDate());
+        if (existingStone.isPresent()) {
+            // 중복 돌이 존재하면 예외 발생 또는 다른 적절한 처리
+            throw new IllegalStateException("이미 동일한 정보의 돌이 존재합니다.");
+        }
+
         Stone stone = Stone.builder()
                 .users(user)
                 .stoneName(request.getStoneName())
@@ -74,7 +84,7 @@ public class StoneService {
     private StoneDetailDTO convertToDetailDTO(Stone stone){
         // Stone 엔티티를 DetailDTO로 변환하는 로직
         String dDay = calculateDate(stone.getStartDate().toLocalDate());
-        //int achPoint = calculateAchieve()
+        long achRate = achieveService.calculateAchievementRate(stone.getId());
         return new StoneDetailDTO(
                 stone.getId(),
                 stone.getStoneName(),
@@ -82,8 +92,7 @@ public class StoneService {
                 stone.getStoneGoal(),
                 stone.getStartDate(),
                 dDay,
-                //달성률 추가
-                //achPoint,
+                achRate,
                 stone.getPowder()
         );
 
@@ -103,8 +112,7 @@ public class StoneService {
         }
     }
 
-    //달성률 계산
-    //public String calculateAchieve()
+
 
 
     //돌 하나 조회

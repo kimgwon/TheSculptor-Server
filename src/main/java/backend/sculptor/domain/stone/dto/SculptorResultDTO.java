@@ -1,24 +1,22 @@
 package backend.sculptor.domain.stone.dto;
 
-import backend.sculptor.domain.stone.entity.Category;
+import backend.sculptor.domain.stone.entity.AchieveStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoneDetailDTO {
+public class SculptorResultDTO {
 
+    private UUID achieveId;
     private UUID stoneId;
-    private String stoneName;
-    private Category category;
-    private String stoneGoal;
-    private LocalDateTime startDate;
-    private String dDay;
-    private long achRate;
+    private LocalDateTime date;
+    private AchieveStatus achieveStatus;
     private int powder;
 }
