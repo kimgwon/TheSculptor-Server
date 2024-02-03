@@ -6,6 +6,8 @@ import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Category;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.StoneRepository;
+import backend.sculptor.domain.user.entity.Users;
+import backend.sculptor.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class StoneService {
     private final StoneRepository stoneRepository;
+    private final UserRepository userRepository;
 
     //돌 전체 조회
     public List<StoneListDTO> getStonesByCategory(UUID userId, Category category) {
@@ -38,8 +41,11 @@ public class StoneService {
 
     //돌 생성
     @Transactional
-    public StoneListDTO createStone(StoneCreateRequest request){
+    public StoneListDTO createStone(UUID userId,StoneCreateRequest request){
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         Stone stone = Stone.builder()
+                .users(user)
                 .stoneName(request.getStoneName())
                 .category(request.getCategory())
                 .stoneGoal(request.getStoneGoal())
@@ -54,6 +60,7 @@ public class StoneService {
         // Stone 엔티티를 StoneDTO로 변환하는 로직
         String dDay = calculateDate(stone.getStartDate().toLocalDate());
         return new StoneListDTO(
+                stone.getUsers().getId(),
                 stone.getId(),
                 stone.getStoneName(),
                 stone.getCategory(),
