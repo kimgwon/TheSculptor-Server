@@ -19,7 +19,6 @@ public class StoneDetailDTO {
     private String stoneGoal;
     private LocalDateTime startDate;
     private String dDay;
-    //달성률 추가해야됨!
-    //private int achPoint;
+    private long achRate;
     private int powder;
 }

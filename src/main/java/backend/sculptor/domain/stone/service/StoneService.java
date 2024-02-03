@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class StoneService {
     private final StoneRepository stoneRepository;
     private final UserRepository userRepository;
+    private final AchieveService achieveService;
 
     //돌 전체 조회
     public List<StoneListDTO> getStonesByCategory(UUID userId, Category category) {
@@ -83,7 +84,7 @@ public class StoneService {
     private StoneDetailDTO convertToDetailDTO(Stone stone){
         // Stone 엔티티를 DetailDTO로 변환하는 로직
         String dDay = calculateDate(stone.getStartDate().toLocalDate());
-        //int achPoint = calculateAchieve()
+        long achRate = achieveService.calculateAchievementRate(stone.getId());
         return new StoneDetailDTO(
                 stone.getId(),
                 stone.getStoneName(),
@@ -91,8 +92,7 @@ public class StoneService {
                 stone.getStoneGoal(),
                 stone.getStartDate(),
                 dDay,
-                //달성률 추가
-                //achPoint,
+                achRate,
                 stone.getPowder()
         );
 
