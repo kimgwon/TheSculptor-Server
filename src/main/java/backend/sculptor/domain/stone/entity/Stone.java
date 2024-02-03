@@ -61,7 +61,8 @@ public class Stone {
      */
 
     @Builder
-    public Stone(String stoneName, Category category, String stoneGoal, LocalDateTime startDate){
+    public Stone(Users users,String stoneName, Category category, String stoneGoal, LocalDateTime startDate){
+        this.users = users;
         this.stoneName = stoneName;
         this.category = category;
         this.stoneGoal = stoneGoal;

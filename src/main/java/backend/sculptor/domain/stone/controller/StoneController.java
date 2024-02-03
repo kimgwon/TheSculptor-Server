@@ -42,13 +42,13 @@ public class StoneController {
     }
     //[POST] 돌 생성하기
     @PostMapping("/workplace/create")
-    public APIBody<StoneListDTO> createStone(@RequestBody StoneCreateRequest request) {
+    public APIBody<StoneListDTO> createStone(@CurrentUser SessionUser user,@RequestBody StoneCreateRequest request) {
         try {
             //유효성 검사
             if (request == null || !request.isValid()) {
                 return APIBody.of(400, "잘못된 요청 데이터입니다.", null);
             }
-            StoneListDTO newStone = stoneService.createStone(request);
+            StoneListDTO newStone = stoneService.createStone(user.getId(),request);
             if (newStone == null) {
 
                 //돌 생성 실패 (서비스 로직 내 실패)
