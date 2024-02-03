@@ -4,6 +4,7 @@ import backend.sculptor.domain.stone.dto.SculptorResultDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.dto.StoneSculptRequest;
 import backend.sculptor.domain.stone.entity.Achieve;
+import backend.sculptor.domain.stone.entity.AchieveStatus;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.AchieveRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
@@ -78,6 +79,22 @@ public class AchieveService {
         achieveRepository.save(achieve); // 달성 기록 저장
 
         return convertToResultDTO(achieve);
+    }
+
+    //달성률 계산
+    public long calculateAchievementRate(UUID stoneId) {
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new RuntimeException("돌을 찾을 수 없습니다."));
+
+        LocalDate startDate = stone.getStartDate().toLocalDate();
+        LocalDate today = LocalDate.now();
+        long totalDays = ChronoUnit.DAYS.between(startDate, today) + 1; // 오늘 포함 계산
+
+        // 시작일로부터 오늘까지 AchieveStatus.A 상태인 Achieve 개수
+        long countAStatus = achieveRepository.findAllByStoneIdAndDateBetweenAndAchieveStatus(stoneId, startDate.atStartOfDay(), today.atTime(23, 59), AchieveStatus.A).size();
+
+        // 달성률 계산
+        return Math.round((double) countAStatus / totalDays * 100);
     }
 
 

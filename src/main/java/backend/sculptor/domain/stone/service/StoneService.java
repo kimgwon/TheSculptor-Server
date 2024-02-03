@@ -112,8 +112,7 @@ public class StoneService {
         }
     }
 
-    //달성률 계산
-    //public String calculateAchieve()
+
 
 
     //돌 하나 조회
