@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Service
@@ -43,20 +44,27 @@ public class AchieveService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new RuntimeException("돌을 찾을 수 없습니다."));
+
         //현재 날짜 기준 미래 시점 요청은 예외처리
         LocalDate today = LocalDate.now();
         if (request.getDate().isAfter(today)) {
             throw new IllegalArgumentException("미래 날짜로 달성 현황을 기록할 수 없습니다.");
         }
 
-        Stone stone = stoneRepository.findById(stoneId)
-                .orElseThrow(() -> new RuntimeException("돌을 찾을 수 없습니다."));
-
+        //시작일로부터 66일 이내에 있는 날짜만 요청 가능
         LocalDate requestDate = request.getDate();
-        achieveRepository.findByStoneIdAndDate(stoneId, requestDate)
-                .ifPresent(a -> {
-                    throw new IllegalStateException("해당 날짜에 대한 기록이 이미 존재합니다.");
-                });
+        long daysBetween = ChronoUnit.DAYS.between(stone.getStartDate().toLocalDate(), requestDate);
+        if (daysBetween < 0 || daysBetween > 65) { // 0일째부터 65일째까지가 66일
+            throw new IllegalArgumentException("요청 날짜가 유효한 범위를 벗어났습니다.");
+        }
+
+        // 동일 날짜에 대한 기록이 이미 있는지 확인
+        boolean exists = achieveRepository.findByStoneIdAndDate(stone.getId(), requestDate).isPresent();
+        if (exists) {
+            throw new IllegalStateException("해당 날짜에 대한 기록이 이미 존재합니다.");
+        }
 
         Achieve achieve = Achieve.builder()
                 .stone(stone)
