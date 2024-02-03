@@ -1,17 +1,21 @@
 package backend.sculptor.domain.stone.service;
 
 import backend.sculptor.domain.stone.dto.StoneCreateRequest;
+import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Category;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.StoneRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,7 +49,7 @@ public class StoneService {
 
     }
 
-    //DTO 변환
+    //StoneList DTO 변환
     private StoneListDTO convertToStoneDTO(Stone stone) {
         // Stone 엔티티를 StoneDTO로 변환하는 로직
         String dDay = calculateDate(stone.getStartDate().toLocalDate());
@@ -57,6 +61,25 @@ public class StoneService {
                 stone.getStartDate(),
                 dDay
         );
+    }
+
+    //StoneDetail DTO 변환
+    private StoneDetailDTO convertToDetailDTO(Stone stone){
+        // Stone 엔티티를 DetailDTO로 변환하는 로직
+        String dDay = calculateDate(stone.getStartDate().toLocalDate());
+        //int achPoint = calculateAchieve()
+        return new StoneDetailDTO(
+                stone.getId(),
+                stone.getStoneName(),
+                stone.getCategory(),
+                stone.getStoneGoal(),
+                stone.getStartDate(),
+                dDay,
+                //달성률 추가
+                //achPoint,
+                stone.getPowder()
+        );
+
     }
 
     //디데이 날짜 계산
@@ -72,5 +95,17 @@ public class StoneService {
             return "D-day";
         }
     }
+
+    //달성률 계산
+    //public String calculateAchieve()
+
+
+    //돌 하나 조회
+    public StoneDetailDTO getStoneByStoneId(UUID userId, UUID stoneId){
+        Optional<Stone> stoneOptional = stoneRepository.findByUsersIdAndId(userId, stoneId);
+        return stoneOptional.map(this::convertToDetailDTO)
+                .orElseThrow(() -> new EntityNotFoundException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
+    }
+
 }
 

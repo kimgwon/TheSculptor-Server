@@ -6,11 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface StoneRepository extends JpaRepository<Stone, UUID> {
     List<Stone> findByUsersId(UUID userId);
     List<Stone> findByUsersIdAndCategory(UUID userId, Category category);
+
+    Optional<Stone> findByUsersIdAndId(UUID userId, UUID stoneId);
 
 }
