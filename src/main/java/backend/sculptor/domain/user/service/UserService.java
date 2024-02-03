@@ -5,6 +5,10 @@ import backend.sculptor.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -22,5 +26,9 @@ public class UserService {
 
     public void deleteUser(Users findUser) {
         userRepository.delete(findUser);
+    }
+
+    public Users findUser(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
     }
 }
