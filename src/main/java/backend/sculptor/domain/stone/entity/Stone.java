@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ public class Stone {
     @Enumerated(EnumType.STRING)
     private Category category; //enum
 
+    @Setter
     private int powder;
 
     private LocalDateTime startDate;

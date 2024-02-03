@@ -69,6 +69,22 @@ public class AchieveService {
             throw new IllegalStateException("해당 날짜에 대한 기록이 이미 존재합니다.");
         }
 
+        // powder 저장하는 로직
+        int powderToAdd = 0;
+        switch (request.getAchieveStatus()) {
+            case A:
+                powderToAdd = 10;
+                break;
+            case B:
+                powderToAdd = 5;
+                break;
+            case C:
+                break;
+        }
+
+        // Stone 엔티티의 powder 값을 업데이트
+        stone.setPowder(stone.getPowder() + powderToAdd);
+
         Achieve achieve = Achieve.builder()
                 .stone(stone)
                 .achieveStatus(request.getAchieveStatus())
