@@ -8,6 +8,7 @@ import backend.sculptor.domain.stone.repository.StoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class AchieveScheduledTask {
 
 
     @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
+    @Transactional
     public void recordMissingAchieves() {
         LocalDate yesterday = LocalDate.now().minusDays(1); // 어제 날짜
         List<Stone> stones = stoneRepository.findAll(); // 모든 Stone 조회
