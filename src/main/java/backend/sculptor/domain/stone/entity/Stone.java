@@ -51,9 +51,12 @@ public class Stone {
     @OneToMany(mappedBy = "stone")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name="achieve_id")
-    private Achieve achieve;
+//    @OneToOne
+//    @JoinColumn(name="achieve_id")
+//    private Achieve achieve;
+
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.ALL)
+    private List<Achieve> achieves = new ArrayList<>();
 
     /*
     //갱신일
