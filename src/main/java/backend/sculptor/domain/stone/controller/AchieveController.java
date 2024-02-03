@@ -38,7 +38,7 @@ public class AchieveController {
             return APIBody.of(200, "달성 현황 기록 성공", newAchieve);
         } catch (Exception e) {
             //기타 서버 오류
-            return APIBody.of(500, "서버 오류 발생" + e.getMessage(), null);
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
         }
 
     }
