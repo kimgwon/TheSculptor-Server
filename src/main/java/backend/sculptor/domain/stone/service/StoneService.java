@@ -44,6 +44,15 @@ public class StoneService {
     public StoneListDTO createStone(UUID userId,StoneCreateRequest request){
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        // 중복 돌 검사
+        Optional<Stone> existingStone = stoneRepository.findByUsersIdAndStoneNameAndCategoryAndStoneGoalAndStartDate(
+                userId, request.getStoneName(), request.getCategory(), request.getStoneGoal(), request.getStartDate());
+        if (existingStone.isPresent()) {
+            // 중복 돌이 존재하면 예외 발생 또는 다른 적절한 처리
+            throw new IllegalStateException("이미 동일한 정보의 돌이 존재합니다.");
+        }
+
         Stone stone = Stone.builder()
                 .users(user)
                 .stoneName(request.getStoneName())
