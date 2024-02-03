@@ -29,10 +29,10 @@ public class Achieve {
     @Enumerated(EnumType.STRING)
     private AchieveStatus achieveStatus;
 
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Builder
-    public Achieve(Stone stone,AchieveStatus achieveStatus, LocalDate date){
+    public Achieve(Stone stone,AchieveStatus achieveStatus, LocalDateTime date){
         this.stone = stone;
         this.achieveStatus = achieveStatus;
         this.date = date;

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class StoneSculptRequest {
 
     private AchieveStatus achieveStatus;
-    private LocalDate date;
+    private LocalDateTime date;
 
     // 유효성 검사 메서드
     public boolean isValid() {

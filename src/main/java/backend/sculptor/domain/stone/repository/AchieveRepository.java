@@ -12,5 +12,5 @@ import java.util.UUID;
 @Repository
 public interface AchieveRepository extends JpaRepository<Achieve, UUID> {
     //날짜 중복 검사
-    Optional<Achieve> findByStoneIdAndDate(UUID stoneId, LocalDate date);
+    Optional<Achieve> findByStoneIdAndDate(UUID stoneId, LocalDateTime date);
 }

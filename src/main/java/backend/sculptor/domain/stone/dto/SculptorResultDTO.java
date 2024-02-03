@@ -16,7 +16,7 @@ public class SculptorResultDTO {
 
     private UUID achieveId;
     private UUID stoneId;
-    private LocalDate date;
+    private LocalDateTime date;
     private AchieveStatus achieveStatus;
     private int powder;
 }

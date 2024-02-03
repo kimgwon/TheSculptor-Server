@@ -70,6 +70,7 @@ public class Stone {
         this.category = category;
         this.stoneGoal = stoneGoal;
         this.startDate = startDate;
+        this.finalDate = startDate.plusDays(65);
     }
 
 

@@ -49,14 +49,16 @@ public class AchieveService {
 
         //현재 날짜 기준 미래 시점 요청은 예외처리
         LocalDate today = LocalDate.now();
-        if (request.getDate().isAfter(today)) {
+        if (request.getDate().toLocalDate().isAfter(today)) {
             throw new IllegalArgumentException("미래 날짜로 달성 현황을 기록할 수 없습니다.");
         }
 
-        //시작일로부터 66일 이내에 있는 날짜만 요청 가능
-        LocalDate requestDate = request.getDate();
-        long daysBetween = ChronoUnit.DAYS.between(stone.getStartDate().toLocalDate(), requestDate);
-        if (daysBetween < 0 || daysBetween > 65) { // 0일째부터 65일째까지가 66일
+        // 시작일로부터 종료일 사이의 날짜만 요청 가능
+        LocalDateTime requestDate = request.getDate();
+        LocalDateTime startDate = stone.getStartDate();
+        LocalDateTime finalDate = stone.getFinalDate();
+
+        if (requestDate.isBefore(startDate) || requestDate.isAfter(finalDate)) {
             throw new IllegalArgumentException("요청 날짜가 유효한 범위를 벗어났습니다.");
         }
 
