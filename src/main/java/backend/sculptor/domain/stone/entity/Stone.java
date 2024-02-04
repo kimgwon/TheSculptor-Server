@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ public class Stone {
     @Enumerated(EnumType.STRING)
     private Category category; //enum
 
+    @Setter
     private int powder;
 
     private LocalDateTime startDate;
@@ -51,9 +53,12 @@ public class Stone {
     @OneToMany(mappedBy = "stone")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name="achieve_id")
-    private Achieve achieve;
+//    @OneToOne
+//    @JoinColumn(name="achieve_id")
+//    private Achieve achieve;
+
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.ALL)
+    private List<Achieve> achieves = new ArrayList<>();
 
     /*
     //갱신일
@@ -61,11 +66,13 @@ public class Stone {
      */
 
     @Builder
-    public Stone(String stoneName, Category category, String stoneGoal, LocalDateTime startDate){
+    public Stone(Users users,String stoneName, Category category, String stoneGoal, LocalDateTime startDate){
+        this.users = users;
         this.stoneName = stoneName;
         this.category = category;
         this.stoneGoal = stoneGoal;
         this.startDate = startDate;
+        this.finalDate = startDate.plusDays(65);
     }
 
 

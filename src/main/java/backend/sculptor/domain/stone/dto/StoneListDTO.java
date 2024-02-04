@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class StoneListDTO {
 
+    private UUID userId;
     private UUID stoneId;
     private String stoneName;
     private Category category;
