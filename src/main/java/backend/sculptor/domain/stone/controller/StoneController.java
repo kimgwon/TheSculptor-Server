@@ -40,6 +40,27 @@ public class StoneController {
             return APIBody.of(500, "서버 오류 발생"+e.getMessage(),null);
         }
     }
+
+    //[GET] 돌 하나씩 조회
+    @GetMapping("/stones/{stoneId}")
+    public APIBody<StoneDetailDTO> getOneStone(@CurrentUser SessionUser user, @PathVariable UUID stoneId) {
+        if (user == null) {
+            // 사용자 인증 실패
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            StoneDetailDTO stone = stoneService.getStoneByStoneId(user.getId(), stoneId);
+            if (stone == null) {
+                // 해당 ID를 가진 돌을 찾을 수 없는 경우
+                return APIBody.of(404, "해당 돌 정보를 찾을 수 없습니다.", null);
+            }
+            return APIBody.of(200, "돌 정보 조회 성공", stone);
+        } catch (Exception e) {
+            // 기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
+    }
+
     //[POST] 돌 생성하기
     @PostMapping("/workplace/create")
     public APIBody<StoneListDTO> createStone(@CurrentUser SessionUser user,@RequestBody StoneCreateRequest request) {
@@ -58,26 +79,6 @@ public class StoneController {
             return APIBody.of(200, "돌 생성 성공", newStone);
         } catch (Exception e) {
             //기타 서버 오류
-            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
-        }
-    }
-
-    //[GET] 돌 하나씩 조회
-    @GetMapping("/stones/{stoneId}")
-    public APIBody<StoneDetailDTO> getOneStone(@CurrentUser SessionUser user, @PathVariable UUID stoneId) {
-        if (user == null) {
-            // 사용자 인증 실패
-            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
-        }
-        try {
-            StoneDetailDTO stone = stoneService.getStoneByStoneId(user.getId(), stoneId);
-            if (stone == null) {
-                // 해당 ID를 가진 돌을 찾을 수 없는 경우
-                return APIBody.of(404, "해당 돌 정보를 찾을 수 없습니다.", null);
-            }
-            return APIBody.of(200, "돌 정보 조회 성공", stone);
-        } catch (Exception e) {
-            // 기타 서버 오류
             return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
         }
     }

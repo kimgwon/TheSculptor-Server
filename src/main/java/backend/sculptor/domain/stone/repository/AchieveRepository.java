@@ -20,4 +20,7 @@ public interface AchieveRepository extends JpaRepository<Achieve, UUID> {
     List<Achieve> findAllByStoneIdAndDateBetweenAndAchieveStatus(UUID stoneId, LocalDateTime startDate, LocalDateTime endDate, AchieveStatus achieveStatus);
 
     List<Achieve> findByStoneId(UUID stoneId);
+
+    //StoneID를 기준으로 모든 Achieve 기록을 날짜 내림차순으로 조회
+    List<Achieve> findByStoneIdOrderByDateDesc(UUID stoneId);
 }
