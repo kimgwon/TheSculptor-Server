@@ -93,7 +93,8 @@ public class StoneService {
                 stone.getStartDate(),
                 dDay,
                 achRate,
-                stone.getPowder()
+                stone.getPowder(),
+                stone.getStoneLike()
         );
 
     }
