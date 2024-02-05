@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Entity
 @IdClass(Follow.PK.class)
 @NoArgsConstructor
+@Getter
 public class Follow {
     @Id
     @Column(name = "to_user", insertable = false, updatable = false)
