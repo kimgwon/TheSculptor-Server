@@ -116,7 +116,9 @@ public class StoneService {
 
 
     //돌 하나 조회
+    @Transactional
     public StoneDetailDTO getStoneByStoneId(UUID userId, UUID stoneId){
+        updateStoneStatusBasedOnAchieves(stoneId);
         Optional<Stone> stoneOptional = stoneRepository.findByUsersIdAndId(userId, stoneId);
         return stoneOptional.map(this::convertToDetailDTO)
                 .orElseThrow(() -> new EntityNotFoundException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
