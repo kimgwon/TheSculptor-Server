@@ -29,7 +29,7 @@ public class FollowController {
             Users targetUser = userService.findUser(followId);
         } catch (Exception e) {
             responseBody = APIBody.of(400, "해당 사용자가 존재하지 않습니다", null);
-            return ResponseEntity.ok(responseBody);
+            return ResponseEntity.badRequest().body(responseBody);
         }
         UUID follow = followService.follow(user.getId(), followId);
         Map<String, Object> data = new HashMap<>();
