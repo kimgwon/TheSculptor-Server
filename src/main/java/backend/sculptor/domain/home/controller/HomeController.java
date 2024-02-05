@@ -3,6 +3,7 @@ package backend.sculptor.domain.home.controller;
 import backend.sculptor.domain.follow.dto.FollowSimpleListDto;
 import backend.sculptor.domain.follow.service.FollowService;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
+import backend.sculptor.domain.stone.service.StoneLikeService;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.dto.UserSearchResultDto;
 import backend.sculptor.domain.user.entity.SessionUser;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
@@ -26,6 +28,7 @@ public class HomeController {
     private final FollowService followService;
     private final UserService userService;
     private final StoneService stoneService;
+    private final StoneLikeService stoneLikeService;
 
     @GetMapping("/followings/stones")
     public ResponseEntity<?> showAllFollowingsStones(@CurrentUser SessionUser user) {
@@ -38,7 +41,9 @@ public class HomeController {
             }
             List<Map<String, Object>> followerStonesList = new ArrayList<>();
             for (FollowSimpleListDto followSimpleListDto : followingList) {
+                UUID userId = followSimpleListDto.getId();
                 StoneDetailDTO stoneDetailDTO = followService.searchStone(followSimpleListDto.getRepresentStoneId());
+                Boolean pressedLike = stoneLikeService.isPressedLike(userId, stoneDetailDTO.getStoneId());
                 Map<String, Object> followerStoneMap = new HashMap<>();
                 followerStoneMap.put("id", followSimpleListDto.getId());
                 followerStoneMap.put("nickname", followSimpleListDto.getNickname());
@@ -48,13 +53,14 @@ public class HomeController {
                 followerStoneMap.put("stoneGoal", stoneDetailDTO.getStoneGoal());
                 followerStoneMap.put("startDate", stoneDetailDTO.getStartDate());
                 // 이하 isLike, like 데이터 추가
-                //followerStoneMap.put("isLike", stoneDTO.getIsLike());
-                //followerStoneMap.put("like", stoneDTO.getLikes);
+                followerStoneMap.put("isLike", pressedLike);
+                followerStoneMap.put("like", stoneDetailDTO.getLikes());
 
                 followerStonesList.add(followerStoneMap);
             }
             response = APIBody.of(200, "모든 팔로잉 사용자의 모든 돌 조회 성공", followerStonesList);
         } catch (Exception e) {
+            System.out.println("e.getMessage() = " + e.getMessage());
             response = APIBody.of(400, "조회중 에러 발생", null);
         }
         return ResponseEntity.ok(response);
@@ -107,6 +113,20 @@ public class HomeController {
                     .collect(Collectors.toList());
             responseBody = APIBody.of(200, "검색 성공.", searchResults);
             return ResponseEntity.ok(responseBody);
+        }
+    }
+
+    @PostMapping("/{stoneId}/like")
+    public ResponseEntity<?> pressLike(@CurrentUser SessionUser user,
+                                       @PathVariable("stoneId") UUID stoneId) {
+        Boolean result = stoneLikeService.pressLikeToStone(stoneId, user.getId());
+        if(result) {
+            Map<String, String> data = new HashMap<>();
+            data.put("stoneId", stoneId.toString());
+            data.put("userId", user.getId().toString());
+            return ResponseEntity.ok(APIBody.of(200, "좋아요 누르기 성공", data));
+        } else {
+            return ResponseEntity.badRequest().body(APIBody.of(400, "좋아요 누르기 실패", null));
         }
     }
 }
