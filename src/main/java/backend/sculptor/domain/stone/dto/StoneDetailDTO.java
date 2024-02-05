@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -21,4 +22,5 @@ public class StoneDetailDTO {
     private String dDay;
     private long achRate;
     private int powder;
+    private int likes;
 }
