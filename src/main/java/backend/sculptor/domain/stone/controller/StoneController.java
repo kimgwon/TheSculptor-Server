@@ -83,5 +83,10 @@ public class StoneController {
         }
     }
 
+    //이끼 제거하기
+
+
+    //균열 메꾸기
+
 
 }

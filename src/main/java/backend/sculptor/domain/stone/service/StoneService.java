@@ -128,6 +128,10 @@ public class StoneService {
     //돌 상태 변화 감지 로직
     @Transactional
     public void updateStoneStatusBasedOnAchieves(UUID stoneId) {
+
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
+
         List<Achieve> achieves = achieveRepository.findByStoneIdOrderByDateDesc(stoneId);
         int consecutiveCs = 0;
 
@@ -145,9 +149,6 @@ public class StoneService {
             }
         }
 
-
-        Stone stone = stoneRepository.findById(stoneId)
-                .orElseThrow(() -> new IllegalArgumentException("Stone not found with ID: " + stoneId));
 
         StoneStatus newStatus = determineStoneStatus(consecutiveCs); // 상태 결정 로직 호출
         if (newStatus != null) {

@@ -1,9 +1,10 @@
 package backend.sculptor.domain.stone.entity;
 
 public enum StoneStatus {
-    MOSS, PLANT, S_CRACK, L_CRACK, BROKEN
+    BASIC, MOSS, PLANT, S_CRACK, L_CRACK, BROKEN
 }
 /**
+ * 기본 BASIC
  * 3일 MOSS : 이끼
  * 5일 PLANT : 식물
  * 7일 S_CRACK : 실금 (small_crack)

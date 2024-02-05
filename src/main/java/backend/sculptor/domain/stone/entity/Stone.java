@@ -49,7 +49,7 @@ public class Stone {
 
     @Enumerated(EnumType.STRING)
     @Setter
-    private StoneStatus status;
+    private StoneStatus status = StoneStatus.BASIC;
 
     @OneToMany(mappedBy = "stone")
     private List<StoneItem> stoneItems = new ArrayList<>();
