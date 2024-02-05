@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -132,11 +133,23 @@ public class StoneService {
         Stone stone = stoneRepository.findById(stoneId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
 
-        List<Achieve> achieves = achieveRepository.findByStoneIdOrderByDateDesc(stoneId);
+        LocalDateTime lastManualChange = stone.getLastManualChange();
+
+        List<Achieve> recentAchieves;
+        if (lastManualChange == null) {
+            // lastManualChange가 null일 경우, 모든 Achieve 기록을 조회
+            recentAchieves = achieveRepository.findByStoneIdOrderByDateAsc(stoneId);
+        } else {
+            // lastManualChange 이후의 Achieve 기록을 조회
+            recentAchieves = achieveRepository.findByStoneIdAndDateAfterOrderByDateAsc(stoneId, lastManualChange);
+        }
+        //List<Achieve> recentAchieves = achieveRepository.findByStoneIdAndDateAfter(stoneId, lastManualChange);
+
+        //List<Achieve> achieves = achieveRepository.findByStoneIdOrderByDateDesc(stoneId);
         int consecutiveCs = 0;
 
         StoneStatus stoneStatus = null;
-        for (Achieve achieve : achieves) {
+        for (Achieve achieve : recentAchieves) {
             if (achieve.getAchieveStatus() == AchieveStatus.C) {
                 consecutiveCs++;
                 stoneStatus = determineStoneStatus(consecutiveCs);
@@ -172,6 +185,25 @@ public class StoneService {
             return null; // 아직 조건을 만족하는 상태가 아님
         }
     }
+
+    //이끼 제거
+    @Transactional
+    public void removeMoss(UUID stoneId) {
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
+
+        // 현재 돌 상태가 MOSS가 아닌 경우 예외 발생
+        if (stone.getStatus() != StoneStatus.MOSS) {
+            throw new IllegalStateException("돌 상태가 이끼(MOSS)가 아니므로, 이끼제거를 수행할 수 없습니다.");
+        }
+
+        // 돌 상태를 BASIC으로 업데이트
+        stone.setStatus(StoneStatus.BASIC);
+        stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트.. 이끼제거, 균열 메꾸기
+        stoneRepository.save(stone);
+    }
+
+
 
 }
 

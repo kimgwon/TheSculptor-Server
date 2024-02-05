@@ -64,6 +64,9 @@ public class Stone {
     @OneToMany(mappedBy = "stone", cascade = CascadeType.ALL)
     private List<Achieve> achieves = new ArrayList<>();
 
+    @Setter
+    private LocalDateTime lastManualChange;
+
     /*
     //갱신일
     private LocalDateTime updated_at;

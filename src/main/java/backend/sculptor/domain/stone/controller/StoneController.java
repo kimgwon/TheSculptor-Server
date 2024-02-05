@@ -10,6 +10,7 @@ import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,6 +65,10 @@ public class StoneController {
     //[POST] 돌 생성하기
     @PostMapping("/workplace/create")
     public APIBody<StoneListDTO> createStone(@CurrentUser SessionUser user,@RequestBody StoneCreateRequest request) {
+        if (user == null) {
+            // 사용자 인증 실패
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
         try {
             //유효성 검사
             if (request == null || !request.isValid()) {
@@ -83,10 +88,29 @@ public class StoneController {
         }
     }
 
-    //이끼 제거하기
+    //[POST] 이끼 제거하기
+    @PostMapping("/stones/{stoneId}/removeMoss")
+    public APIBody<?> removeMoss(@CurrentUser SessionUser user, @PathVariable UUID stoneId) {
+        if (user == null) {
+            // 사용자 인증 실패
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            stoneService.removeMoss(stoneId);
+            return APIBody.of(200, "이끼가 성공적으로 제거되었습니다.", null);
 
+        } catch (IllegalStateException e) {
 
-    //균열 메꾸기
+            // 돌 상태가 이끼(MOSS)가 아닌 경우
+            return APIBody.of(400, e.getMessage(), null);
+
+        } catch (Exception e) {
+            // 기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
+    }
+
+    //[POST] 균열 메꾸기
 
 
 }
