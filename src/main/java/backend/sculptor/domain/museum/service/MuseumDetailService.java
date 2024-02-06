@@ -1,51 +1,51 @@
 package backend.sculptor.domain.museum.service;
 
-import backend.sculptor.domain.comment.entity.Comment;
+import backend.sculptor.domain.comment.dto.CommentDTO;
+import backend.sculptor.domain.comment.service.CommentService;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.StoneRepository;
-import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
-import backend.sculptor.domain.museum.dto.MuseumDetail;
+import backend.sculptor.domain.museum.dto.MuseumDetailDTO;
+import backend.sculptor.global.exception.NotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class MuseumDetailService {
 
     private final UserRepository userRepository;
     private final StoneRepository stoneRepository;
-    private final CommentRepository commentRepository;
+    private final CommentService commentService;
 
     @Autowired
-    public MuseumDetailService(UserRepository userRepository, StoneRepository stoneRepository, CommentRepository commentRepository) {
+    public MuseumDetailService(UserRepository userRepository, StoneRepository stoneRepository, CommentService commentService) {
         this.userRepository = userRepository;
         this.stoneRepository = stoneRepository;
-        this.commentRepository = commentRepository;
+        this.commentService = commentService;
     }
 
-    public Optional<MuseumDetail> getMuseumDetailInfo(UUID ownerId, UUID stoneId) {
-        Optional<Stone> optionalStone = stoneRepository.findById(stoneId);
-        List<Comment> comments = commentRepository.findByStoneId(stoneId);
+    public MuseumDetailDTO getMuseumDetailInfo(UUID userId, UUID ownerId, UUID stoneId) {
+        MuseumDetailDTO museumDetailDTO = new MuseumDetailDTO();
 
-        return optionalStone.map(stone -> convertToMuseumDetail(stone, comments));
+        userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException("User not found"));
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new NotFoundException("Stone not found"));
+        List<CommentDTO.Info> comments = commentService.getComments(userId, ownerId, stoneId);
+
+        museumDetailDTO.setStone(convertToMuseumDetailStone(stone));
+        museumDetailDTO.setComments(comments);
+
+        return museumDetailDTO;
     }
 
-    private MuseumDetail convertToMuseumDetail(Stone stone, List<Comment> comments) {
-        MuseumDetail museumDetail = new MuseumDetail();
+    private MuseumDetailDTO.Stone convertToMuseumDetailStone(Stone stone) {
+        MuseumDetailDTO.Stone museumDatailStone = new MuseumDetailDTO.Stone();
 
-        museumDetail.setStone(convertToMuseumDetailStone(stone));
-        museumDetail.setComments(convertToMuseumDetailComments(comments));
-
-        return museumDetail;
-    }
-
-    private MuseumDetail.Stone convertToMuseumDetailStone(Stone stone) {
-        MuseumDetail.Stone museumDatailStone = new MuseumDetail.Stone();
         museumDatailStone.setId(stone.getId());
         museumDatailStone.setName(stone.getStoneName());
         museumDatailStone.setCategory(stone.getCategory().name());
@@ -56,22 +56,5 @@ public class MuseumDetailService {
         museumDatailStone.setPowder(stone.getPowder());
 
         return museumDatailStone;
-    }
-
-    private List<MuseumDetail.Comment> convertToMuseumDetailComments(List<Comment> comments) {
-        return comments.stream()
-                .map(comment -> {
-                    MuseumDetail.Comment commentDTO = new MuseumDetail.Comment();
-                    Users writer = userRepository.findById(comment.getUserId());
-
-                    commentDTO.setGuestId(comment.getUserId());
-                    commentDTO.setGuestNickname(writer.getNickname());
-                    commentDTO.setContent(comment.getContent());
-                    commentDTO.setLike(comment.isLike());
-                    commentDTO.setDate(comment.getWriteAt());
-
-                    return commentDTO;
-                })
-                .collect(Collectors.toList());
     }
 }
