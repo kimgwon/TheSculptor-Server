@@ -22,6 +22,7 @@ public class Users {
     private String role;
     private String nickname;
     private String profileImage;
+    private String userIntroduction;
 
     @Column(nullable = false)
     private Boolean isPublic = true;
