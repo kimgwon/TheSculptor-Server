@@ -58,6 +58,7 @@ public class FollowService {
                 dDay,
                 achievementRate,
                 stone.getPowder(),
+                stone.getStatus(),
                 stone.getStoneLike()
                 );
         return stoneInfo;

@@ -10,6 +10,7 @@ import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,27 +41,6 @@ public class StoneController {
             return APIBody.of(500, "서버 오류 발생"+e.getMessage(),null);
         }
     }
-    //[POST] 돌 생성하기
-    @PostMapping("/workplace/create")
-    public APIBody<StoneListDTO> createStone(@CurrentUser SessionUser user,@RequestBody StoneCreateRequest request) {
-        try {
-            //유효성 검사
-            if (request == null || !request.isValid()) {
-                return APIBody.of(400, "잘못된 요청 데이터입니다.", null);
-            }
-            StoneListDTO newStone = stoneService.createStone(user.getId(),request);
-            if (newStone == null) {
-
-                //돌 생성 실패 (서비스 로직 내 실패)
-                return APIBody.of(500, "돌을 생성하지 못했습니다.", null);
-            }
-            //돌 생성 성공
-            return APIBody.of(200, "돌 생성 성공", newStone);
-        } catch (Exception e) {
-            //기타 서버 오류
-            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
-        }
-    }
 
     //[GET] 돌 하나씩 조회
     @GetMapping("/stones/{stoneId}")
@@ -81,6 +61,56 @@ public class StoneController {
             return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
         }
     }
+
+    //[POST] 돌 생성하기
+    @PostMapping("/workplace/create")
+    public APIBody<StoneListDTO> createStone(@CurrentUser SessionUser user,@RequestBody StoneCreateRequest request) {
+        if (user == null) {
+            // 사용자 인증 실패
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            //유효성 검사
+            if (request == null || !request.isValid()) {
+                return APIBody.of(400, "잘못된 요청 데이터입니다.", null);
+            }
+            StoneListDTO newStone = stoneService.createStone(user.getId(),request);
+            if (newStone == null) {
+
+                //돌 생성 실패 (서비스 로직 내 실패)
+                return APIBody.of(500, "돌을 생성하지 못했습니다.", null);
+            }
+            //돌 생성 성공
+            return APIBody.of(200, "돌 생성 성공", newStone);
+        } catch (Exception e) {
+            //기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
+    }
+
+    //[POST] 이끼 제거하기
+    @PostMapping("/stones/{stoneId}/removeMoss")
+    public APIBody<?> removeMoss(@CurrentUser SessionUser user, @PathVariable UUID stoneId) {
+        if (user == null) {
+            // 사용자 인증 실패
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            stoneService.removeMoss(stoneId);
+            return APIBody.of(200, "이끼가 성공적으로 제거되었습니다.", null);
+
+        } catch (IllegalStateException e) {
+
+            // 돌 상태가 이끼(MOSS)가 아닌 경우
+            return APIBody.of(400, e.getMessage(), null);
+
+        } catch (Exception e) {
+            // 기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
+    }
+
+    //[POST] 균열 메꾸기
 
 
 }

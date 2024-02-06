@@ -3,8 +3,8 @@ package backend.sculptor.domain.stone.service;
 import backend.sculptor.domain.stone.dto.StoneCreateRequest;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
-import backend.sculptor.domain.stone.entity.Category;
-import backend.sculptor.domain.stone.entity.Stone;
+import backend.sculptor.domain.stone.entity.*;
+import backend.sculptor.domain.stone.repository.AchieveRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class StoneService {
     private final StoneRepository stoneRepository;
     private final UserRepository userRepository;
+    private final AchieveRepository achieveRepository;
     private final AchieveService achieveService;
 
     //돌 전체 조회
@@ -94,6 +95,7 @@ public class StoneService {
                 dDay,
                 achRate,
                 stone.getPowder(),
+                stone.getStatus(),
                 stone.getStoneLike()
         );
 
@@ -114,14 +116,95 @@ public class StoneService {
     }
 
 
-
-
     //돌 하나 조회
+    @Transactional
     public StoneDetailDTO getStoneByStoneId(UUID userId, UUID stoneId){
+        updateStoneStatusBasedOnAchieves(stoneId);
         Optional<Stone> stoneOptional = stoneRepository.findByUsersIdAndId(userId, stoneId);
         return stoneOptional.map(this::convertToDetailDTO)
                 .orElseThrow(() -> new EntityNotFoundException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
     }
 
+
+    //돌 상태 변화 감지 로직
+    @Transactional
+    public void updateStoneStatusBasedOnAchieves(UUID stoneId) {
+
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
+
+        LocalDateTime lastManualChange = stone.getLastManualChange();
+
+        List<Achieve> recentAchieves;
+        if (lastManualChange == null) {
+            // lastManualChange가 null일 경우, 모든 Achieve 기록을 조회
+            recentAchieves = achieveRepository.findByStoneIdOrderByDateAsc(stoneId);
+        } else {
+            // lastManualChange 이후의 Achieve 기록을 조회
+            recentAchieves = achieveRepository.findByStoneIdAndDateAfterOrderByDateAsc(stoneId, lastManualChange);
+        }
+        //List<Achieve> recentAchieves = achieveRepository.findByStoneIdAndDateAfter(stoneId, lastManualChange);
+
+        //List<Achieve> achieves = achieveRepository.findByStoneIdOrderByDateDesc(stoneId);
+        int consecutiveCs = 0;
+
+        StoneStatus stoneStatus = null;
+        for (Achieve achieve : recentAchieves) {
+            if (achieve.getAchieveStatus() == AchieveStatus.C) {
+                consecutiveCs++;
+                stoneStatus = determineStoneStatus(consecutiveCs);
+                if (stoneStatus != null) {
+                    // 조건을 만족하는 경우, 즉시 루프 종료
+                    break;
+                }
+            } else {
+                consecutiveCs = 0; // 연속성이 깨질 경우 카운트 리셋
+            }
+        }
+
+
+        StoneStatus newStatus = determineStoneStatus(consecutiveCs); // 상태 결정 로직 호출
+        if (newStatus != null) {
+            stone.setStatus(newStatus); // 상태 업데이트
+            stoneRepository.save(stone); // 변경 사항 저장
+        }
+    }
+
+    private StoneStatus determineStoneStatus(int consecutiveCs) {
+        if (consecutiveCs >= 12) {
+            return StoneStatus.BROKEN;
+        } else if (consecutiveCs >= 10) {
+            return StoneStatus.L_CRACK;
+        } else if (consecutiveCs >= 7) {
+            return StoneStatus.S_CRACK;
+        } else if (consecutiveCs >= 5) {
+            return StoneStatus.PLANT;
+        } else if (consecutiveCs >= 3) {
+            return StoneStatus.MOSS;
+        } else {
+            return null; // 아직 조건을 만족하는 상태가 아님
+        }
+    }
+
+    //이끼 제거
+    @Transactional
+    public void removeMoss(UUID stoneId) {
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
+
+        // 현재 돌 상태가 MOSS가 아닌 경우 예외 발생
+        if (stone.getStatus() != StoneStatus.MOSS) {
+            throw new IllegalStateException("돌 상태가 이끼(MOSS)가 아니므로, 이끼제거를 수행할 수 없습니다.");
+        }
+
+        // 돌 상태를 BASIC으로 업데이트
+        stone.setStatus(StoneStatus.BASIC);
+        stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트.. 이끼제거, 균열 메꾸기
+        stoneRepository.save(stone);
+    }
+
+
+
 }
+
 

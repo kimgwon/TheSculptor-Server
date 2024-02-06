@@ -18,7 +18,7 @@ public class AchieveController {
 
     private final AchieveService achieveService;
 
-    //[POST] 돌 조각_달성현황 기록하기
+    //[POST] 돌 조각하기_달성현황 기록하기
     @PostMapping("/stones/{stoneId}/sculpt")
     public APIBody<SculptorResultDTO> sculptStone(@CurrentUser SessionUser user, @PathVariable UUID stoneId, @RequestBody StoneSculptRequest request) {
         try {
@@ -57,5 +57,12 @@ public class AchieveController {
             return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
         }
     }
+
+    //돌 이끼 제거
+
+
+    //돌 균열 메꾸기
+
+
 }
 
