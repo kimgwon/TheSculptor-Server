@@ -192,15 +192,43 @@ public class StoneService {
         Stone stone = stoneRepository.findById(stoneId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
 
-        // 현재 돌 상태가 MOSS가 아닌 경우 예외 발생
-        if (stone.getStatus() != StoneStatus.MOSS) {
-            throw new IllegalStateException("돌 상태가 이끼(MOSS)가 아니므로, 이끼제거를 수행할 수 없습니다.");
-        }
+//        // 현재 돌 상태가 MOSS가 아닌 경우 예외 발생
+//        if (stone.getStatus() != StoneStatus.MOSS) {
+//            throw new IllegalStateException("돌 상태가 이끼(MOSS)가 아니므로, 이끼제거를 수행할 수 없습니다.");
+//        }
+//
+//        // 돌 상태를 BASIC으로 업데이트
+//        stone.setStatus(StoneStatus.BASIC);
+//        stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트.. 이끼제거, 균열 메꾸기
+//        stoneRepository.save(stone);
 
-        // 돌 상태를 BASIC으로 업데이트
-        stone.setStatus(StoneStatus.BASIC);
-        stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트.. 이끼제거, 균열 메꾸기
-        stoneRepository.save(stone);
+
+        // 현재 돌 상태가 MOSS 또는 PLANT인 경우에만 처리
+        if (stone.getStatus() == StoneStatus.MOSS || stone.getStatus() == StoneStatus.PLANT) {
+            // 돌 상태를 BASIC으로 업데이트
+            stone.setStatus(StoneStatus.BASIC);
+            stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트
+            stoneRepository.save(stone);
+        } else {
+            // 그 외의 상태에서는 예외 발생
+            throw new IllegalStateException("돌 상태가 이끼(MOSS) 또는 식물(PLANT)이 아니므로, 이끼제거를 수행할 수 없습니다.");
+        }
+    }
+
+    //균열 메꾸기
+    public void repairCrack(UUID stoneId){
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
+
+        if (stone.getStatus() == StoneStatus.S_CRACK || stone.getStatus() == StoneStatus.L_CRACK) {
+            // 돌 상태를 BASIC으로 업데이트
+            stone.setStatus(StoneStatus.BASIC);
+            stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트
+            stoneRepository.save(stone);
+        } else {
+            // 그 외의 상태에서는 예외 발생
+            throw new IllegalStateException("돌 상태가 실금(S_CRACK) 또는 균열(L_CRACK)이 아니므로, 균열 메꾸기를 수행할 수 없습니다.");
+        }
     }
 
 
