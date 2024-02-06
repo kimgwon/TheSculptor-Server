@@ -1,14 +1,15 @@
 package backend.sculptor.domain.museum.service;
 
+import backend.sculptor.domain.follow.service.FollowService;
+import backend.sculptor.domain.museum.dto.MuseumDTO;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
-import backend.sculptor.domain.museum.dto.MuseumDTO;
-import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,13 +19,14 @@ public class MuseumService {
 
     private final UserRepository userRepository;
     private final StoneRepository stoneRepository;
-    //private final FollowService followService;
+    private final FollowService followService;
 
     @Autowired
-    public MuseumService(UserRepository userRepository, StoneRepository stoneRepository) {
+    public MuseumService(UserRepository userRepository, StoneRepository stoneRepository, FollowService followService) {
+
         this.userRepository = userRepository;
         this.stoneRepository = stoneRepository;
-        //this.followService = followService;
+        this.followService = followService;
     }
 
     public MuseumDTO getMuseumInfo(UUID ownerId, UUID userID) {
@@ -38,10 +40,10 @@ public class MuseumService {
         museumDTO.setIsOwner(userID);
         museumDTO.setOwnerId(ownerId);
         museumDTO.setOwnerNickname(owner.getNickname());
-        //museumDTO.setOwnerIntroduction(owner.getIntroduction());
+        museumDTO.setOwnerIntroduction(owner.getUserIntroduction());
         museumDTO.setOwnerProfileImage(owner.getProfileImage());
-        //museumDTO.setFollowerCount(followService.getFollowerCount(ownerId));
-        //museumDTO.setFollowingCount(followService.getFollowingCount(ownerId));
+        museumDTO.setFollowerCount(followService.getFollowerSize(ownerId));
+        museumDTO.setFollowingCount(followService.getFollowingSize(ownerId));
 
         museumDTO.setStones(convertToMuseumStones(stones));
         museumDTO.setStoneCount();

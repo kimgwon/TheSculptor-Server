@@ -20,11 +20,11 @@ public class MuseumDTO {
     private boolean isOwner;
     private UUID ownerId;
     private String ownerNickname;
-    //private String ownerIntroduction;
+    private String ownerIntroduction;
     private String ownerProfileImage;
     private int stoneCount;
-//    private int followerCount;
-//    private int followingCount;
+    private int followerCount;
+    private int followingCount;
     private List<Stone> stones;
 
     public void setIsOwner(UUID userId) {
