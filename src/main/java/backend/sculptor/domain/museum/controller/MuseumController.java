@@ -1,4 +1,3 @@
-/*
 package backend.sculptor.domain.museum.controller;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
@@ -32,12 +31,6 @@ public class MuseumController {
         this.museumDetailService = museumDetailService;
         this.commentService = commentService;
     }
-
-//    @ExceptionHandler(ServiceException.class)
-//    public ResponseEntity<APIBody<?>> handleServiceException(ServiceException e) {
-//        APIBody<?> errorResponse = e.getErrorResponse();
-//        return ResponseEntity.ok(errorResponse);
-//    }
 
     @GetMapping("/users/{ownerId}")
     public ResponseEntity<APIBody<MuseumDTO>> getMuseumInfo(@CurrentUser SessionUser user, @PathVariable UUID ownerId) {
