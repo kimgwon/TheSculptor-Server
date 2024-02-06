@@ -1,3 +1,4 @@
+/*
 package backend.sculptor.domain.museum.controller;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
@@ -70,7 +71,7 @@ public class MuseumController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(APIBody.of(404, e.getMessage(), null));
         }
     }
-
+    
     @PostMapping("/users/{ownerId}/stones/{stoneId}/comments")
     public ResponseEntity<APIBody<CommentDTO.Response>> saveComment(
             @CurrentUser SessionUser user,

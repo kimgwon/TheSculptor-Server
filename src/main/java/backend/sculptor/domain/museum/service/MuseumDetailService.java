@@ -1,3 +1,4 @@
+/*
 package backend.sculptor.domain.museum.service;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
@@ -58,3 +59,4 @@ public class MuseumDetailService {
         return museumDatailStone;
     }
 }
+*/
