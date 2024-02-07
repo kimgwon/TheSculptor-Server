@@ -190,45 +190,44 @@ public class StoneService {
     @Transactional
     public void removeMoss(UUID stoneId) {
         Stone stone = stoneRepository.findById(stoneId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
 
-//        // 현재 돌 상태가 MOSS가 아닌 경우 예외 발생
-//        if (stone.getStatus() != StoneStatus.MOSS) {
-//            throw new IllegalStateException("돌 상태가 이끼(MOSS)가 아니므로, 이끼제거를 수행할 수 없습니다.");
-//        }
-//
-//        // 돌 상태를 BASIC으로 업데이트
-//        stone.setStatus(StoneStatus.BASIC);
-//        stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트.. 이끼제거, 균열 메꾸기
-//        stoneRepository.save(stone);
+        final int mossRemovalCost = 50;
 
-
-        // 현재 돌 상태가 MOSS 또는 PLANT인 경우에만 처리
-        if (stone.getStatus() == StoneStatus.MOSS || stone.getStatus() == StoneStatus.PLANT) {
-            // 돌 상태를 BASIC으로 업데이트
-            stone.setStatus(StoneStatus.BASIC);
-            stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트
-            stoneRepository.save(stone);
-        } else {
-            // 그 외의 상태에서는 예외 발생
-            throw new IllegalStateException("돌 상태가 이끼(MOSS) 또는 식물(PLANT)이 아니므로, 이끼제거를 수행할 수 없습니다.");
+        if (!(stone.getStatus() == StoneStatus.MOSS || stone.getStatus() == StoneStatus.PLANT)) {
+            // 돌 상태가 적합하지 않은 경우
+            throw new IllegalStateException("돌 상태가 이끼(MOSS) 또는 식물(PLANT)이 아니어서 이끼제거를 수행할 수 없습니다.");
+        } else if (stone.getPowder() < mossRemovalCost) {
+            // 필요 포인트가 부족한 경우
+            throw new IllegalStateException("이끼제거를 수행하기에 포인트가 부족합니다. 필요 포인트: " + mossRemovalCost + ", 현재 포인트: " + stone.getPowder());
         }
+
+        // 조건을 만족하는 경우, 돌 상태 업데이트 및 포인트 차감
+        stone.setStatus(StoneStatus.BASIC);
+        stone.setPowder(stone.getPowder() - mossRemovalCost);
+        stone.setLastManualChange(LocalDateTime.now());
+        stoneRepository.save(stone);
     }
 
-    //균열 메꾸기
-    public void repairCrack(UUID stoneId){
-        Stone stone = stoneRepository.findById(stoneId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: "+ stoneId));
 
-        if (stone.getStatus() == StoneStatus.S_CRACK || stone.getStatus() == StoneStatus.L_CRACK) {
-            // 돌 상태를 BASIC으로 업데이트
-            stone.setStatus(StoneStatus.BASIC);
-            stone.setLastManualChange(LocalDateTime.now()); // lastmanualchange 업데이트
-            stoneRepository.save(stone);
-        } else {
-            // 그 외의 상태에서는 예외 발생
-            throw new IllegalStateException("돌 상태가 실금(S_CRACK) 또는 균열(L_CRACK)이 아니므로, 균열 메꾸기를 수행할 수 없습니다.");
+    //균열 메꾸기
+    @Transactional
+    public void repairCrack(UUID stoneId) {
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
+
+        final int crackRepairCost = 100; // 균열 메꾸기에 필요한 포인트
+
+        if (!(stone.getStatus() == StoneStatus.S_CRACK || stone.getStatus() == StoneStatus.L_CRACK)) {
+            throw new IllegalStateException("돌 상태가 실금(S_CRACK) 또는 균열(L_CRACK)이 아니어서 균열 메꾸기를 수행할 수 없습니다.");
+        } else if (stone.getPowder() < crackRepairCost) {
+            throw new IllegalStateException("균열 메꾸기를 수행하기에 포인트가 부족합니다. 필요 포인트: " + crackRepairCost + ", 현재 포인트: " + stone.getPowder());
         }
+
+        stone.setStatus(StoneStatus.BASIC);
+        stone.setPowder(stone.getPowder() - crackRepairCost);
+        stone.setLastManualChange(LocalDateTime.now()); // 마지막 수동 변경 시간 기록
+        stoneRepository.save(stone);
     }
 
 
