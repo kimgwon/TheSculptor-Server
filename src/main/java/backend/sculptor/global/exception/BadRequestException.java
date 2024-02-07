@@ -5,12 +5,12 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class SessionExpiredException extends RuntimeException {
+public class BadRequestException extends RuntimeException {
     private final transient APIBody<?> errorResponse;
 
-    public SessionExpiredException(String message) {
+    public BadRequestException(String message) {
         super(message);
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         this.errorResponse = APIBody.of(status.value(), message, null);
     }
 }

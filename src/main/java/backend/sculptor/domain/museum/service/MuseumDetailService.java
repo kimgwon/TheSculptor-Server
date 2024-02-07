@@ -2,40 +2,31 @@ package backend.sculptor.domain.museum.service;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
 import backend.sculptor.domain.comment.service.CommentService;
-import backend.sculptor.domain.stone.entity.Stone;
-import backend.sculptor.domain.stone.repository.StoneRepository;
-import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.museum.dto.MuseumDetailDTO;
-import backend.sculptor.global.exception.NotFoundException;
+import backend.sculptor.domain.stone.entity.Stone;
+import backend.sculptor.domain.stone.service.AchieveService;
+import backend.sculptor.domain.stone.service.StoneService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class MuseumDetailService {
-
-    private final UserRepository userRepository;
-    private final StoneRepository stoneRepository;
+    private final StoneService stoneService;
     private final CommentService commentService;
+    private final AchieveService achieveService;
 
-    @Autowired
-    public MuseumDetailService(UserRepository userRepository, StoneRepository stoneRepository, CommentService commentService) {
-        this.userRepository = userRepository;
-        this.stoneRepository = stoneRepository;
-        this.commentService = commentService;
-    }
-
-    public MuseumDetailDTO getMuseumDetailInfo(UUID userId, UUID ownerId, UUID stoneId) {
+    public MuseumDetailDTO getMuseumDetailInfo(UUID userId, UUID stoneId) {
         MuseumDetailDTO museumDetailDTO = new MuseumDetailDTO();
 
-        userRepository.findById(ownerId).orElseThrow(() -> new NotFoundException("User not found"));
-        Stone stone = stoneRepository.findById(stoneId)
-                .orElseThrow(() -> new NotFoundException("Stone not found"));
-        List<CommentDTO.Info> comments = commentService.getComments(userId, ownerId, stoneId);
+        Stone stone = stoneService.getStoneByStoneIdAfterFinalDate(stoneId);
+        List<CommentDTO.Info> comments = commentService.getComments(userId, stoneId);
 
         museumDetailDTO.setStone(convertToMuseumDetailStone(stone));
         museumDetailDTO.setComments(comments);
@@ -45,14 +36,15 @@ public class MuseumDetailService {
 
     private MuseumDetailDTO.Stone convertToMuseumDetailStone(Stone stone) {
         MuseumDetailDTO.Stone museumDatailStone = new MuseumDetailDTO.Stone();
+        LocalDateTime startDate = stone.getStartDate();
 
         museumDatailStone.setId(stone.getId());
         museumDatailStone.setName(stone.getStoneName());
         museumDatailStone.setCategory(stone.getCategory().name());
         museumDatailStone.setGoal(stone.getStoneGoal());
-        museumDatailStone.setStartDate(stone.getStartDate());
+        museumDatailStone.setStartDate(startDate);
         museumDatailStone.setOneComment(stone.getOneComment());
-        museumDatailStone.setDDay(stone.getFinalDate());
+        museumDatailStone.setDDay(stoneService.calculateDate(startDate.toLocalDate()));
         museumDatailStone.setPowder(stone.getPowder());
 
         return museumDatailStone;

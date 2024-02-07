@@ -9,6 +9,9 @@ import backend.sculptor.domain.stone.repository.StoneItemRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
+import backend.sculptor.global.exception.BadRequestException;
+import backend.sculptor.global.exception.ErrorCode;
+import backend.sculptor.global.exception.NotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,16 @@ public class StoneService {
             stones = stoneRepository.findByUsersIdAndCategory(userId, category);
         }
         return stones.stream().map(this::convertToStoneDTO).collect(Collectors.toList());
+    }
+
+    // 목표일 이후 날짜의 돌 전체 조회 (박물관)
+    public List<StoneListDTO> getStonesByUserIdAfterFinalDate(UUID userId) {
+        List<Stone> stones = stoneRepository.findByUsersId(userId);
+        LocalDateTime currentDate = LocalDateTime.now();
+        return stones.stream()
+                .filter(stone -> stone.getFinalDate().isBefore(currentDate)) // 목표일 이후인 돌만 필터링
+                .map(this::convertToStoneDTO)
+                .toList();
     }
 
     //돌 생성
@@ -117,7 +130,6 @@ public class StoneService {
         }
     }
 
-
     //돌 하나 조회
     @Transactional
     public StoneDetailDTO getStoneByStoneId(UUID userId, UUID stoneId){
@@ -127,6 +139,19 @@ public class StoneService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
     }
 
+
+    // 목표일 이후 날짜의 돌 하나 조회 (박물관)
+    public Stone getStoneByStoneIdAfterFinalDate(UUID stoneId) {
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.STONE_NOT_FOUND.getMessage()));
+
+        // 돌의 목표일이 오늘 날짜 이후인지 확인
+        if (stone.getFinalDate().isAfter(LocalDateTime.now())) {
+            throw new BadRequestException(ErrorCode.STONE_NOT_COMPLETE.getMessage());
+        }
+
+        return stone;
+    }
 
     //돌 상태 변화 감지 로직
     @Transactional
