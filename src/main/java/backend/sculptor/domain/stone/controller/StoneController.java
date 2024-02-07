@@ -119,11 +119,11 @@ public class StoneController {
         }
         try {
             stoneService.repairCrack(stoneId);
-            return APIBody.of(200, "이끼가 성공적으로 제거되었습니다.", null);
+            return APIBody.of(200, "균열이 성공적으로 메워졌습니다.", null);
 
         } catch (IllegalStateException e) {
 
-            // 돌 상태가 이끼(MOSS)가 아닌 경우
+            // 돌 상태가 실금(S_CRACK) 또는 균열(L_CRACK)가 아닌 경우
             return APIBody.of(400, e.getMessage(), null);
 
         } catch (Exception e) {
