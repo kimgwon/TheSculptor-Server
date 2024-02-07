@@ -1,6 +1,7 @@
 package backend.sculptor.domain.stone.dto;
 
 import backend.sculptor.domain.stone.entity.Category;
+import backend.sculptor.domain.stone.entity.StoneStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,5 +23,6 @@ public class StoneDetailDTO {
     private String dDay;
     private long achRate;
     private int powder;
+    private StoneStatus stoneStatus;
     private int likes;
 }
