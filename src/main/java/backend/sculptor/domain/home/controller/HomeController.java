@@ -36,8 +36,8 @@ public class HomeController {
         try {
             List<FollowSimpleListDto> followingList = followService.getFollowingList(user.getId());
             if (followingList.isEmpty()) { //팔로우 하는 사람이 없으면
-                APIBody<List<Map<String, Object>>> noFollowing = APIBody.of(200, "팔로우 하는 사용자가 없습니다.", null);
-                return ResponseEntity.ok(noFollowing);
+                APIBody<List<Map<String, Object>>> noFollowing = APIBody.of(400, "팔로우 하는 사용자가 없습니다.", null);
+                return ResponseEntity.badRequest().body(noFollowing);
             }
             List<Map<String, Object>> followerStonesList = new ArrayList<>();
             for (FollowSimpleListDto followSimpleListDto : followingList) {
@@ -92,6 +92,7 @@ public class HomeController {
 
         } catch (NoSuchElementException e) {
             responseBody = APIBody.of(400, "사용자 ID, 돌 ID 에러", null);
+            return ResponseEntity.badRequest().body(responseBody);
         }
 
         return ResponseEntity.ok(responseBody);
