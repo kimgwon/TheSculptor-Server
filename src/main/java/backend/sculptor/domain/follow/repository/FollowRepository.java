@@ -4,6 +4,7 @@ import backend.sculptor.domain.follow.entity.Follow;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface FollowRepository extends JpaRepository<Follow, Follow.PK> {
@@ -19,4 +20,6 @@ public interface FollowRepository extends JpaRepository<Follow, Follow.PK> {
 
     List<Follow> findAllByFromUser(UUID userId);
     List<Follow> findAllByToUser(UUID toUser);
+    Optional<Follow> findByFromUserAndToUser(UUID fromUserId, UUID toUserId);
+    boolean existsByFromUserAndToUser(UUID followerId, UUID followeeId);
 }

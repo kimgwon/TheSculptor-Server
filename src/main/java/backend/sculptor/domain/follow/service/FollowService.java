@@ -13,10 +13,7 @@ import backend.sculptor.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -88,5 +85,23 @@ public class FollowService {
         Follow follow = new Follow(followId, currentUserId);
         followRepository.save(follow);
         return followId;
+    }
+
+    public Boolean toggleFollow(UUID fromUserId, UUID toUserId) {
+        Optional<Follow> existingFollow = followRepository.findByFromUserAndToUser(fromUserId, toUserId);
+
+        // 해당 사용자가 이미 팔로우한 경우 언팔로우
+        if (existingFollow.isPresent()) {
+            followRepository.delete(existingFollow.get());
+            return false;
+        } else { // 팔로우하지 않은 경우 팔로우
+            Follow follow = new Follow(toUserId, fromUserId);
+            followRepository.save(follow);
+            return true;
+        }
+    }
+
+    public boolean isFollowing(UUID fromUserId, UUID toUserId) {
+        return followRepository.existsByFromUserAndToUser(fromUserId, toUserId);
     }
 }
