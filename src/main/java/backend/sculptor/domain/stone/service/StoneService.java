@@ -5,6 +5,8 @@ import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Category;
 import backend.sculptor.domain.stone.entity.Stone;
+import backend.sculptor.domain.stone.entity.StoneItem;
+import backend.sculptor.domain.stone.repository.StoneItemRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
@@ -28,6 +30,7 @@ public class StoneService {
     private final StoneRepository stoneRepository;
     private final UserRepository userRepository;
     private final AchieveService achieveService;
+    private final StoneItemRepository stoneItemRepository;
 
     //돌 전체 조회
     public List<StoneListDTO> getStonesByCategory(UUID userId, Category category) {
@@ -123,5 +126,10 @@ public class StoneService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
     }
 
+
+    public List<StoneItem> findAllStoneItem(Stone stone) {
+        List<StoneItem> result = stoneItemRepository.findAllByStone(stone);
+        return result;
+    }
 }
 
