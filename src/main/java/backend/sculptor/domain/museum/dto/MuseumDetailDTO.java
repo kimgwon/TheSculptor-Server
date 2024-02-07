@@ -1,5 +1,6 @@
 package backend.sculptor.domain.museum.dto;
 
+import backend.sculptor.domain.comment.dto.CommentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MuseumDetail {
+public class MuseumDetailDTO {
 
     private Stone stone;
 
@@ -45,17 +46,5 @@ public class MuseumDetail {
         }
     }
 
-    private List<Comment> comments;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Comment {
-        private UUID guestId;
-        private String guestNickname;
-        private String content;
-        private boolean isLike;
-        private LocalDateTime date;
-    }
+    private List<CommentDTO.Info> comments;
 }

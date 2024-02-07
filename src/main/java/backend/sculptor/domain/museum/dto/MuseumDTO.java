@@ -15,7 +15,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Museum {
+public class MuseumDTO {
 
     private boolean isOwner;
     private UUID ownerId;

@@ -1,6 +1,7 @@
 package backend.sculptor.global.oauth.annotation;
 
 import backend.sculptor.domain.user.entity.SessionUser;
+import backend.sculptor.global.exception.SessionExpiredException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -27,6 +28,10 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
-        return httpSession.getAttribute("user");
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new SessionExpiredException("Session expired or user not logged in");
+        }
+        return sessionUser;
     }
 }

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,17 @@ public class AchieveService {
                 achieve.getAchieveStatus());
     }
 
+    //돌 달성현황 계산 로직
+    public static Map<String, Long> AchievementCounts(List<Achieve> achieves) {
+        // 달성 현황 계산
+        Map<AchieveStatus, Long> counts = achieves.stream()
+                .collect(Collectors.groupingBy(Achieve::getAchieveStatus, Collectors.counting()));
+
+        // Map<AchieveStatus, Long>를 Map<String, Long>으로 변환
+        return counts.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().name(), Map.Entry::getValue));
+    }
+
     //돌 달성현황 전체 조회
     @Transactional(readOnly = true)
     public StoneAchievesListDTO findAllAchievesByStoneId(UUID stoneId) {
@@ -57,8 +69,10 @@ public class AchieveService {
                 .map(this::convertToAchieveDTO)
                 .collect(Collectors.toList());
 
+        Map<String, Long> achievementCounts = AchievementCounts(achieves);
+
         // Stone 정보와 AchieveDTO 리스트를 포함하는 StoneAchievesDTO 반환
-        return new StoneAchievesListDTO(stoneId, achieveDTOs);
+        return new StoneAchievesListDTO(stoneId, achievementCounts, achieveDTOs);
     }
 
 

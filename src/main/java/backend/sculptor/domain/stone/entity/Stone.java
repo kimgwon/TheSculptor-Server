@@ -44,8 +44,12 @@ public class Stone {
 
     private int stoneLike;
 
-    @OneToMany(mappedBy = "stones")
-    private List<Status> statuses;
+//    @OneToMany(mappedBy = "stones")
+//    private List<Status> statuses;
+
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private StoneStatus status = StoneStatus.BASIC;
 
     @OneToMany(mappedBy = "stone")
     private List<StoneItem> stoneItems = new ArrayList<>();
@@ -59,6 +63,9 @@ public class Stone {
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.ALL)
     private List<Achieve> achieves = new ArrayList<>();
+
+    @Setter
+    private LocalDateTime lastManualChange;
 
     /*
     //갱신일
