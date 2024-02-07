@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -13,5 +14,6 @@ import java.util.UUID;
 public class StoneAchievesListDTO {
 
     private UUID stoneId;
+    private Map<String, Long> achievementCounts;
     private List<AchieveDTO> achieves;
 }

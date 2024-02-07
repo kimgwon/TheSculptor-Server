@@ -111,6 +111,25 @@ public class StoneController {
     }
 
     //[POST] 균열 메꾸기
+    @PostMapping("/stones/{stoneId}/repairCrack")
+    public APIBody<?> repairCrack(@CurrentUser SessionUser user, @PathVariable UUID stoneId) {
+        if (user == null) {
+            // 사용자 인증 실패
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            stoneService.repairCrack(stoneId);
+            return APIBody.of(200, "이끼가 성공적으로 제거되었습니다.", null);
 
+        } catch (IllegalStateException e) {
+
+            // 돌 상태가 이끼(MOSS)가 아닌 경우
+            return APIBody.of(400, e.getMessage(), null);
+
+        } catch (Exception e) {
+            // 기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
+        }
+    }
 
 }
