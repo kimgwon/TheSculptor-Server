@@ -15,7 +15,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.getWriter().print("{\"code\": 200, \"message\": \"Logout Success\", \"data\": null}");
-        response.sendRedirect("/loginForm");
+        //response.sendRedirect("/loginForm");
         response.getWriter().flush();
     }
 }
