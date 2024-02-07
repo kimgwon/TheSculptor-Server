@@ -17,8 +17,9 @@ public class CommentDTO {
         private UUID writerId;
         private String writerNickname;
         private String content;
-        private boolean isLike;
-        private LocalDateTime writeAt;
+        private Boolean isLike;
+        private Integer likeCount;
+        private String writeAt;
     }
 
 
@@ -27,7 +28,6 @@ public class CommentDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Request{
-        private UUID writerId;
         private String content;
     }
 

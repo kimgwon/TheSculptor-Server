@@ -1,13 +1,13 @@
 package backend.sculptor.domain.museum.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,45 +17,32 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MuseumDTO {
 
-    private boolean isOwner;
-    private UUID ownerId;
-    private String ownerNickname;
-    //private String ownerIntroduction;
-    private String ownerProfileImage;
+    private Boolean isOwner;
+    private Boolean isFollowing;
+    private UUID id;
+    private String nickname;
+    private String introduction;
+    private String profileImage;
     private int stoneCount;
-//    private int followerCount;
-//    private int followingCount;
+    private int followerCount;
+    private int followingCount;
+
     private List<Stone> stones;
-
-    public void setIsOwner(UUID userId) {
-        this.isOwner = this.ownerId == userId;
-    }
-
-    public void setStoneCount() {
-        this.stoneCount = stones != null ? stones.size() : 0;
-    }
 
     @Getter
     @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class Stone {
         private UUID id;
         private String name;
-        private String goal;
+        @JsonFormat(pattern = "yyyy.MM.dd")
         private LocalDateTime startDate;
-        private long dDay;
+        @JsonProperty(value = "dDay")
+        private String dDay;
+    }
 
-        // d-day 계산 메서드
-        public void setDDay(LocalDateTime finalDate) {
-            if (startDate != null && finalDate != null) {
-                LocalDate currentDate = LocalDate.now();
-                LocalDate goalDate = finalDate.toLocalDate();
-                this.dDay = ChronoUnit.DAYS.between(currentDate, goalDate);
-            } else {
-                this.dDay = 0; // 시작일 또는 종료일이 없는 경우 0으로 설정
-            }
-        }
+    public void setIsOwner(UUID userId) { this.isOwner = this.id == userId; }
+    public void setStoneCount() {
+        this.stoneCount = stones != null ? stones.size() : 0;
     }
 }
 

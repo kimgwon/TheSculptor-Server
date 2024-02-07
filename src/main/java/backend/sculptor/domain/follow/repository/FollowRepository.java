@@ -1,12 +1,10 @@
 package backend.sculptor.domain.follow.repository;
 
-import backend.sculptor.domain.follow.dto.FollowSimpleListDto;
 import backend.sculptor.domain.follow.entity.Follow;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface FollowRepository extends JpaRepository<Follow, Follow.PK> {
@@ -21,4 +19,7 @@ public interface FollowRepository extends JpaRepository<Follow, Follow.PK> {
     //List<FollowSimpleListDto> findAllByToUser(UUID userId);	 // 사용자를 팔로우하는 관계를 가져옴
 
     List<Follow> findAllByFromUser(UUID userId);
+    List<Follow> findAllByToUser(UUID toUser);
+    Optional<Follow> findByFromUserAndToUser(UUID fromUserId, UUID toUserId);
+    boolean existsByFromUserAndToUser(UUID followerId, UUID followeeId);
 }

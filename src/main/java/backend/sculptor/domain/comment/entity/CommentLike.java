@@ -1,13 +1,11 @@
 package backend.sculptor.domain.comment.entity;
 
-import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.user.entity.Users;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity

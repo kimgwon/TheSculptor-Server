@@ -31,12 +31,15 @@ public class FollowController {
             responseBody = APIBody.of(400, "해당 사용자가 존재하지 않습니다", null);
             return ResponseEntity.badRequest().body(responseBody);
         }
-        UUID follow = followService.follow(user.getId(), followId);
+
+        boolean isFollowing = followService.toggleFollow(user.getId(), followId);
         Map<String, Object> data = new HashMap<>();
+
         data.put("fromUser", user.getId());
         data.put("toUser", followId);
+        data.put("isFollowing", isFollowing);
 
-        responseBody = APIBody.of(200, "팔로우 요청 성공", data);
+        responseBody = APIBody.of(200, "팔로우 상태 변경 성공", data);
         return ResponseEntity.ok(responseBody);
     }
 }

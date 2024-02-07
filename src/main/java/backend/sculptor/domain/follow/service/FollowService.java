@@ -9,7 +9,6 @@ import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.stone.service.AchieveService;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.entity.Users;
-import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,25 +23,44 @@ public class FollowService {
     private final StoneService stoneService;
     private final AchieveService achieveService;
     private final UserService userService;
-    public List<FollowSimpleListDto> getFollowingList(UUID userId){
-        List<Follow> followList = followRepository.findAllByFromUser(userId);
-        List<FollowSimpleListDto> followingDtoList = new ArrayList<>();
+
+    public List<FollowSimpleListDto> getFollowingList(UUID userId) {
+        List<Follow> followings = followRepository.findAllByFromUser(userId);
+
+        return convertToDtoList(followings);
+    }
+
+    public List<FollowSimpleListDto> getFollowerList(UUID userId) {
+        List<Follow> followers = followRepository.findAllByToUser(userId);
+
+        return convertToDtoList(followers);
+    }
+
+    public Integer getFollowingSize(UUID userId){
+        return getFollowingList(userId).size();
+    }
+
+    public Integer getFollowerSize(UUID userId){
+        return getFollowerList(userId).size();
+    }
+
+    private List<FollowSimpleListDto> convertToDtoList(List<Follow> followList) {
+        List<FollowSimpleListDto> dtoList = new ArrayList<>();
+
         for (Follow follow : followList) {
-            UUID followingUserId = follow.getToUser(); // 팔로우하는 사용자의 ID
+            UUID followingUserId = follow.getToUser();
             Users findUser = userService.findUser(followingUserId);
-            String nickname = findUser.getNickname(); // 팔로우하는 사용자의 닉네임
-            UUID representStoneId = findUser.getRepresentStoneId(); // 대표 돌의 ID
 
-            // DTO 객체 생성
-            FollowSimpleListDto dto = new FollowSimpleListDto(followingUserId, nickname, representStoneId);
+            if (findUser != null) {
+                String nickname = findUser.getNickname();
+                UUID representStoneId = findUser.getRepresentStoneId();
 
-            // DTO 리스트에 추가
-            followingDtoList.add(dto);
+                FollowSimpleListDto dto = new FollowSimpleListDto(followingUserId, nickname, representStoneId);
+                dtoList.add(dto);
+            }
         }
-        for (FollowSimpleListDto dto : followingDtoList) {
-            System.out.println(dto);
-        }
-        return followingDtoList;
+
+        return dtoList;
     }
 
     public StoneDetailDTO searchStone(UUID representStoneId) {
@@ -67,5 +85,23 @@ public class FollowService {
         Follow follow = new Follow(followId, currentUserId);
         followRepository.save(follow);
         return followId;
+    }
+
+    public Boolean toggleFollow(UUID fromUserId, UUID toUserId) {
+        Optional<Follow> existingFollow = followRepository.findByFromUserAndToUser(fromUserId, toUserId);
+
+        // 해당 사용자가 이미 팔로우한 경우 언팔로우
+        if (existingFollow.isPresent()) {
+            followRepository.delete(existingFollow.get());
+            return false;
+        } else { // 팔로우하지 않은 경우 팔로우
+            Follow follow = new Follow(toUserId, fromUserId);
+            followRepository.save(follow);
+            return true;
+        }
+    }
+
+    public boolean isFollowing(UUID fromUserId, UUID toUserId) {
+        return followRepository.existsByFromUserAndToUser(fromUserId, toUserId);
     }
 }
