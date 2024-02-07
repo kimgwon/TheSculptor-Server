@@ -5,6 +5,7 @@ import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.*;
 import backend.sculptor.domain.stone.repository.AchieveRepository;
+import backend.sculptor.domain.stone.repository.StoneItemRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
@@ -29,6 +30,7 @@ public class StoneService {
     private final UserRepository userRepository;
     private final AchieveRepository achieveRepository;
     private final AchieveService achieveService;
+    private final StoneItemRepository stoneItemRepository;
 
     //돌 전체 조회
     public List<StoneListDTO> getStonesByCategory(UUID userId, Category category) {
@@ -231,6 +233,10 @@ public class StoneService {
     }
 
 
+    public List<StoneItem> findAllStoneItem(Stone stone) {
+        List<StoneItem> result = stoneItemRepository.findAllByStone(stone);
+        return result;
+    }
 
 }
 
