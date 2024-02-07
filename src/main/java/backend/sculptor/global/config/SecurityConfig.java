@@ -34,8 +34,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/token/**").permitAll() //토큰 발급을 위한 경로는 모두 허용
                         .requestMatchers("/loginForm","/","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
-                        .requestMatchers("/loginForm").authenticated() // 로그인 접근 가능
-                                .anyRequest().permitAll()
+                        .requestMatchers("/mypage/**",
+                                "/**").authenticated() // 로그인 접근 가능
+                                //.anyRequest().permitAll()
                         )
                 .headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
             //.requestMatchers("/private/**").authenticated() //private로 시작하는 uri는 로그인 필수
@@ -44,7 +45,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(oAuth2MemberService))
                                 .successHandler(customAuthenticationSuccessHandler)
-                                //.loginPage("/loginForm") //로그인이 필요한데 로그인을 하지 않았다면 이동할 uri 설정
+                                .loginPage("/loginForm") //로그인이 필요한데 로그인을 하지 않았다면 이동할 uri 설정
                         //.defaultSuccessUrl("/", true)
                 );
 
