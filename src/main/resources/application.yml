@@ -23,7 +23,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: sculptor-db.c78i8e20qx93.ap-northeast-2.rds.amazonaws.com
+    url: jdbc:mysql://sculptor-db.c78i8e20qx93.ap-northeast-2.rds.amazonaws.com:3306/mydatabase
     username: user_sc
     password: sculptor1!
 
