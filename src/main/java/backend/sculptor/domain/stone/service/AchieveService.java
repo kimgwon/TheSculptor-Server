@@ -8,6 +8,8 @@ import backend.sculptor.domain.stone.repository.AchieveRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
+import backend.sculptor.global.exception.ErrorCode;
+import backend.sculptor.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +53,19 @@ public class AchieveService {
 
     //돌 달성현황 계산 로직
     public static Map<String, Long> AchievementCounts(List<Achieve> achieves) {
+        // 달성 현황 계산
+        Map<AchieveStatus, Long> counts = achieves.stream()
+                .collect(Collectors.groupingBy(Achieve::getAchieveStatus, Collectors.counting()));
+
+        // Map<AchieveStatus, Long>를 Map<String, Long>으로 변환
+        return counts.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().name(), Map.Entry::getValue));
+    }
+
+    //돌 달성현황 계산 로직(박물관)
+    public Map<String, Long> achievementCountsByStoneId(UUID stoneId) {
+        List<Achieve> achieves = achieveRepository.findByStoneId(stoneId);
+
         // 달성 현황 계산
         Map<AchieveStatus, Long> counts = achieves.stream()
                 .collect(Collectors.groupingBy(Achieve::getAchieveStatus, Collectors.counting()));
@@ -151,5 +166,23 @@ public class AchieveService {
         return Math.round((double) countAStatus / totalDays * 100);
     }
 
+    //달성률 계산(박물관)
+    public int calculateAchievementRateToFinalDate(UUID stoneId) {
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.STONE_NOT_FOUND.getMessage()));
 
+        LocalDate startDate = stone.getStartDate().toLocalDate();
+        LocalDate endDate = stone.getFinalDate().toLocalDate();
+
+        // 시작일부터 목표일까지의 기간
+        long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
+        List<Achieve> achieves = achieveRepository.findByStoneId(stoneId);
+        // 달성한 날짜들의 개수
+        long achievedDays = achieves.stream()
+                .filter(achieve -> achieve.getAchieveStatus() == AchieveStatus.A)
+                .count();
+
+        // 달성률 계산
+        return (int) Math.round((double) achievedDays / totalDays * 100);
+    }
 }
