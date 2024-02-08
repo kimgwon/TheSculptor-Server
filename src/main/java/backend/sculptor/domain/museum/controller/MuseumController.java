@@ -1,6 +1,7 @@
 package backend.sculptor.domain.museum.controller;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
+import backend.sculptor.domain.comment.dto.CommentLikeDTO;
 import backend.sculptor.domain.comment.service.CommentService;
 import backend.sculptor.domain.museum.dto.MuseumDTO;
 import backend.sculptor.domain.museum.dto.MuseumDetailDTO;
@@ -13,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,11 +42,14 @@ public class MuseumController {
     }
 
     @GetMapping("/stones/{stoneId}/comments")
-    public APIBody<List<CommentDTO.Info>> getComments(
+    public APIBody<Map<String, List<CommentDTO.Info>>> getComments(
             @CurrentUser SessionUser user,
             @PathVariable UUID stoneId) {
         List<CommentDTO.Info> comments = commentService.getComments(user.getId(), stoneId);
-        return APIBody.of(HttpStatus.OK.value(), "방명록 조회 성공", comments);
+        Map<String, List<CommentDTO.Info>> data = new HashMap<>();
+        data.put("comments", comments);
+
+        return APIBody.of(HttpStatus.OK.value(), "방명록 조회 성공", data);
     }
     
     @PostMapping("/stones/{stoneId}/comments")
@@ -56,10 +62,11 @@ public class MuseumController {
     }
 
     @PatchMapping("/comments/{commentId}/like")
-    public APIBody<Boolean> toggleCommentLike(
+    public APIBody<CommentLikeDTO> toggleCommentLike(
             @CurrentUser SessionUser user,
             @PathVariable UUID commentId) {
-        Boolean isLike = commentService.toggleCommentLike(user.getId(), commentId);
-        return APIBody.of(HttpStatus.OK.value(), "좋아요 상태 변경 성공", isLike);
+        CommentLikeDTO commentLike = commentService.toggleCommentLike(user.getId(), commentId);
+
+        return APIBody.of(HttpStatus.OK.value(), "좋아요 상태 변경 성공", commentLike);
     }
 }
