@@ -31,20 +31,18 @@ public class MuseumService {
 
         List<StoneListDTO> stones = stoneService.getStonesByUserIdAfterFinalDate(ownerId);
 
-        MuseumDTO museum = new MuseumDTO();
-
-        museum.setIsOwner(userID);
-        museum.setIsFollowing(followService.isFollowing(userID, ownerId));
-        museum.setId(ownerId);
-        museum.setNickname(owner.getNickname());
-        museum.setIntroduction(owner.getUserIntroduction());
-        museum.setProfileImage(owner.getProfileImage());
-        museum.setStones(convertToMuseumStones(stones));
-        museum.setFollowerCount(followService.getFollowerSize(ownerId));
-        museum.setFollowingCount(followService.getFollowingSize(ownerId));
-        museum.setStoneCount();
-
-        return museum;
+        return MuseumDTO.builder()
+                .isOwner(isOwner(ownerId, userID))
+                .isFollowing(followService.isFollowing(userID, ownerId))
+                .id(ownerId)
+                .nickname(owner.getNickname())
+                .introduction(owner.getUserIntroduction())
+                .profileImage(owner.getProfileImage())
+                .stones(convertToMuseumStones(stones))
+                .followerCount(followService.getFollowerSize(ownerId))
+                .followingCount(followService.getFollowingSize(ownerId))
+                .stoneCount(getStoneCount(stones))
+                .build();
     }
 
     // Stone 엔터티를 MuseumStoneDTO로 변환하는 메서드
@@ -56,14 +54,18 @@ public class MuseumService {
 
     // 단일 Stone 엔터티를 MuseumStoneDTO로 변환하는 메서드
     private MuseumDTO.Stone convertToMuseumStone(StoneListDTO stone) {
-        MuseumDTO.Stone museumStone = new MuseumDTO.Stone();
         LocalDateTime startDate = stone.getStartDate();
 
-        museumStone.setId(stone.getStoneId());
-        museumStone.setName(stone.getStoneName());
-        museumStone.setStartDate(startDate);
-        museumStone.setDDay(stoneService.calculateDate(startDate.toLocalDate()));
+        return MuseumDTO.Stone.builder()
+                .id(stone.getStoneId())
+                .name(stone.getStoneName())
+                .startDate(startDate)
+                .dDay(stoneService.calculateDate(startDate.toLocalDate()))
+                .build();
+    }
 
-        return museumStone;
+    public boolean isOwner(UUID ownerId, UUID userId) { return ownerId == userId; }
+    public int getStoneCount(List<StoneListDTO> stones) {
+        return stones != null ? stones.size() : 0;
     }
 }
