@@ -5,6 +5,7 @@ import backend.sculptor.domain.comment.service.CommentService;
 import backend.sculptor.domain.museum.dto.MuseumDetailDTO;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.AchieveService;
+import backend.sculptor.domain.stone.service.StoneLikeService;
 import backend.sculptor.domain.stone.service.StoneService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,34 +20,35 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MuseumDetailService {
     private final StoneService stoneService;
+    private final StoneLikeService stoneLikeService;
     private final CommentService commentService;
     private final AchieveService achieveService;
 
     public MuseumDetailDTO getMuseumDetailInfo(UUID userId, UUID stoneId) {
-        MuseumDetailDTO museumDetailDTO = new MuseumDetailDTO();
-
         Stone stone = stoneService.getStoneByStoneIdAfterFinalDate(stoneId);
         List<CommentDTO.Info> comments = commentService.getComments(userId, stoneId);
 
-        museumDetailDTO.setStone(convertToMuseumDetailStone(stone));
-        museumDetailDTO.setComments(comments);
-
-        return museumDetailDTO;
+        return MuseumDetailDTO.builder()
+                .stone(convertToMuseumDetailStone(userId, stone))
+                .comments(comments)
+                .build();
     }
 
-    private MuseumDetailDTO.Stone convertToMuseumDetailStone(Stone stone) {
-        MuseumDetailDTO.Stone museumDatailStone = new MuseumDetailDTO.Stone();
+    private MuseumDetailDTO.Stone convertToMuseumDetailStone(UUID userId, Stone stone) {
         LocalDateTime startDate = stone.getStartDate();
 
-        museumDatailStone.setId(stone.getId());
-        museumDatailStone.setName(stone.getStoneName());
-        museumDatailStone.setCategory(stone.getCategory().name());
-        museumDatailStone.setGoal(stone.getStoneGoal());
-        museumDatailStone.setStartDate(startDate);
-        museumDatailStone.setOneComment(stone.getOneComment());
-        museumDatailStone.setDDay(stoneService.calculateDate(startDate.toLocalDate()));
-        museumDatailStone.setPowder(stone.getPowder());
-
-        return museumDatailStone;
+        return MuseumDetailDTO.Stone.builder()
+                .id(stone.getId())
+                .name(stone.getStoneName())
+                .category(stone.getCategory().name())
+                .goal(stone.getStoneGoal())
+                .startDate(startDate)
+                .oneComment(stone.getOneComment())
+                .isLike(stoneLikeService.isPressedLike(userId, stone.getId()))
+                .dDay(stoneService.calculateDate(startDate.toLocalDate()))
+                .powder(stone.getPowder())
+                .achievementRate(achieveService.calculateAchievementRateToFinalDate(stone.getId()))
+                .achievementCounts(achieveService.achievementCountsByStoneId(stone.getId()))
+                .build();
     }
 }
