@@ -1,0 +1,50 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://sculptor-db.c78i8e20qx93.ap-northeast-2.rds.amazonaws.com:3306/mydatabase
+    username: user_sc
+    password: sculptor1!
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 58501606959-8lkn1eq9p5q27tm5von9v10710vo0er1.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - profile
+              - email
+          kakao:
+            client-id: 15aa3d78d4bad7175d904a3c7ac20cf6
+            client-secret: QhNggcOsnMhwHbvMcD8gDMjxvyg8Xdqe
+            scope:
+              - profile_nickname
+              - profile_image
+            client-name: kakao-login
+            authorization-grant-type: authorization_code
+            redirect-uri: http://3.35.203.29/login/oauth2/code/kakao
+            client-authentication-method: client_secret_post
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize #?prompt=login
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+domain:
+  name: http://3.35.203.29
