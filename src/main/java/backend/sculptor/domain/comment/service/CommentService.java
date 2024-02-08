@@ -1,6 +1,7 @@
 package backend.sculptor.domain.comment.service;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
+import backend.sculptor.domain.comment.dto.CommentLikeDTO;
 import backend.sculptor.domain.comment.entity.Comment;
 import backend.sculptor.domain.comment.entity.CommentLike;
 import backend.sculptor.domain.comment.repository.CommentRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -39,18 +41,18 @@ public class CommentService {
     private List<CommentDTO.Info> convertToCommentResponse(UUID userId, List<Comment> comments) {
         return comments.stream()
                 .map(originalComment -> {
-                    CommentDTO.Info comment = new CommentDTO.Info();
                     Users writer = originalComment.getWriter();
 
-                    comment.setId(originalComment.getId());
-                    comment.setWriterId(writer.getId());
-                    comment.setWriterNickname(writer.getNickname());
-                    comment.setContent(originalComment.getContent());
-                    comment.setIsLike(checkUserLikedComment(userId, originalComment));
-                    comment.setLikeCount(getLikeCount(originalComment.getId()));
-                    comment.setWriteAt(calculateWriteAt(originalComment.getWriteAt()));
-
-                    return comment;
+                    return CommentDTO.Info.builder()
+                            .id(originalComment.getId())
+                            .writerId(writer.getId())
+                            .writerNickname(writer.getNickname())
+                            .writerProfileImage(writer.getProfileImage())
+                            .content(originalComment.getContent())
+                            .isLike(checkUserLikedComment(userId, originalComment))
+                            .likeCount(getLikeCount(originalComment.getId()))
+                            .writeAt(calculateWriteAt(originalComment.getWriteAt()))
+                            .build();
                 })
                 .toList();
     }
@@ -68,7 +70,7 @@ public class CommentService {
         } else if (hoursDifference < 60*24) {
             return hoursDifference + "시간 전";
         } else {
-            return writeAt.toLocalDate().toString();
+            return writeAt.format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
         }
     }
 
@@ -78,28 +80,28 @@ public class CommentService {
                 .anyMatch(commentLike -> commentLike.getUsers().getId().equals(userId));
     }
 
+    @Transactional
     public CommentDTO.Response createComment(UUID userId, UUID stoneId, CommentDTO.Request commentRequest) {
         Users writer = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage() + userId));
         Stone stone = stoneService.getStoneByStoneIdAfterFinalDate(stoneId);
 
-        Comment comment = new Comment();
-        comment.setStone(stone);
-        comment.setWriter(writer);
-        comment.setContent(commentRequest.getContent());
-        comment.setWriteAt(LocalDateTime.now());
+        Comment comment = Comment.builder()
+                .stone(stone)
+                .writer(writer)
+                .content(commentRequest.getContent())
+                .build();
 
         // Comment 저장 후 반환
         Comment savedComment = save(comment);
 
-        CommentDTO.Response commentDTO = new CommentDTO.Response();
-        commentDTO.setId(savedComment.getId());
-        commentDTO.setStoneId(savedComment.getStone().getId());
-        commentDTO.setWriterId(savedComment.getWriter().getId());
-        commentDTO.setContent(savedComment.getContent());
-        commentDTO.setWriteAt(savedComment.getWriteAt());
-
-        return commentDTO;
+        return CommentDTO.Response.builder()
+                .id(savedComment.getId())
+                .stoneId(savedComment.getStone().getId())
+                .writerId(savedComment.getWriter().getId())
+                .content(savedComment.getContent())
+                .writeAt(savedComment.getWriteAt())
+                .build();
     }
 
     public Integer getLikeCount(UUID commentId) {
@@ -107,7 +109,8 @@ public class CommentService {
         return optionalComment.map(comment -> comment.getLikes().size()).orElse(0);
     }
 
-    public Boolean toggleCommentLike(UUID userId, UUID commentId) {
+    @Transactional
+    public CommentLikeDTO toggleCommentLike(UUID userId, UUID commentId) {
         Comment comment = getCommentByCommentId(commentId);
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage() + userId));
@@ -116,13 +119,21 @@ public class CommentService {
 
         if (existingLike.isPresent()) {
             commentLikeService.delete(existingLike.get());
-            return false;
+            return CommentLikeDTO.builder()
+                    .commentId(commentId)
+                    .isLike(false)
+                    .build();
         } else {
-            CommentLike newLike = new CommentLike();
-            newLike.setUsers(user);
-            newLike.setComment(comment);
+            CommentLike newLike = CommentLike.builder()
+                    .users(user)
+                    .comment(comment)
+                    .build();
+
             commentLikeService.save(newLike);
-            return true;
+            return CommentLikeDTO.builder()
+                    .commentId(commentId)
+                    .isLike(true)
+                    .build();
         }
     }
 
@@ -135,6 +146,7 @@ public class CommentService {
         return commentRepository.findByStoneId(stoneId);
     }
 
+    @Transactional
     public Comment save(Comment comment){
         return commentRepository.save(comment);
     }
