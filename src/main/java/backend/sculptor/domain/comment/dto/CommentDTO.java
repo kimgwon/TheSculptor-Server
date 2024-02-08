@@ -1,30 +1,28 @@
 package backend.sculptor.domain.comment.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class CommentDTO {
+public final class CommentDTO {
     @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
+    @Builder
     public static class Info {
         private UUID id;
         private UUID writerId;
         private String writerNickname;
+        private String writerProfileImage;
         private String content;
         private Boolean isLike;
         private Integer likeCount;
         private String writeAt;
     }
 
-
     @Getter
-    @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Request{
@@ -32,9 +30,7 @@ public class CommentDTO {
     }
 
     @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
+    @Builder
     public static class Response {
         private UUID id;
         private UUID stoneId;
