@@ -11,6 +11,8 @@ import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -147,4 +149,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("/user-logout")
+    public ResponseEntity<APIBody<String>> logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            System.out.println("로그아웃 session = " + session.getId());
+            session.invalidate();
+            APIBody<String> response = APIBody.of(200, "로그아웃 성공", null);
+            return ResponseEntity.ok(response);
+        } else {
+            APIBody<String> response = APIBody.of(400, "세션이 존재하지 않음", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 }
