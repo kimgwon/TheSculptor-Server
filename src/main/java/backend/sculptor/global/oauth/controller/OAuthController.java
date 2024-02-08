@@ -9,14 +9,4 @@ public class OAuthController {
     public String home() {
         return "loginForm";
     }
-
-    @GetMapping("/private")
-    public String privatePage() {
-        return "privatePage";
-    }
-
-    @GetMapping("/admin")
-    public String adminPage() {
-        return "adminPage";
-    }
 }
