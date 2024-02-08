@@ -1,6 +1,6 @@
 spring:
   profiles:
-    default: dev
+    default: prod
 
 logging.level:
   org.hibernate.SQL: debug
