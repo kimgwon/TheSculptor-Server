@@ -3,9 +3,10 @@ package backend.sculptor.domain.comment.entity;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.user.entity.Users;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,12 +15,14 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Comment {
-    @Id @GeneratedValue
+    @Id
+    @Builder.Default
     @Column(name = "comment_id")
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="stone_id")
@@ -30,7 +33,9 @@ public class Comment {
     private Users writer;
 
     private String content;
-    private LocalDateTime writeAt;
+
+    @Builder.Default
+    private LocalDateTime writeAt = LocalDateTime.now(); // 현재 시간으로 설정
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentLike> likes = new ArrayList<>();
