@@ -1,9 +1,7 @@
 package backend.sculptor.domain.comment.service;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
-import backend.sculptor.domain.comment.dto.CommentLikeDTO;
 import backend.sculptor.domain.comment.entity.Comment;
-import backend.sculptor.domain.comment.entity.CommentLike;
 import backend.sculptor.domain.comment.repository.CommentRepository;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.StoneService;
@@ -29,7 +27,6 @@ public class CommentService {
     private final UserRepository userRepository;
     private final StoneService stoneService;
     private final CommentRepository commentRepository;
-    private final CommentLikeService commentLikeService;
 
     public List<CommentDTO.Info> getComments(UUID userId, UUID stoneId) {
         stoneService.getStoneByStoneIdAfterFinalDate(stoneId);
@@ -107,34 +104,6 @@ public class CommentService {
     public Integer getLikeCount(UUID commentId) {
         Optional<Comment> optionalComment = Optional.ofNullable(getCommentByCommentId(commentId));
         return optionalComment.map(comment -> comment.getLikes().size()).orElse(0);
-    }
-
-    @Transactional
-    public CommentLikeDTO toggleCommentLike(UUID userId, UUID commentId) {
-        Comment comment = getCommentByCommentId(commentId);
-        Users user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage() + userId));
-
-        Optional<CommentLike> existingLike = commentLikeService.findByUsersAndComment(user, comment);
-
-        if (existingLike.isPresent()) {
-            commentLikeService.delete(existingLike.get());
-            return CommentLikeDTO.builder()
-                    .commentId(commentId)
-                    .isLike(false)
-                    .build();
-        } else {
-            CommentLike newLike = CommentLike.builder()
-                    .users(user)
-                    .comment(comment)
-                    .build();
-
-            commentLikeService.save(newLike);
-            return CommentLikeDTO.builder()
-                    .commentId(commentId)
-                    .isLike(true)
-                    .build();
-        }
     }
 
     public Comment getCommentByCommentId(UUID commentId){
