@@ -15,11 +15,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         try {
             System.out.println("Session ID = " + request.getSession().getId());
-            System.out.println("1여기까지는 된다는거잖아");
             response.setContentType("application/json;charset=UTF-8");
-            System.out.println("2여기는 되는거야?");
             response.setStatus(HttpServletResponse.SC_OK);
-            System.out.println("3여기는 되는거야?");
             // 세션 ID 가져오기
             String sessionId = request.getSession().getId();
 
@@ -32,14 +29,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             // JSON 응답 전송
             PrintWriter writer = response.getWriter();
             writer.write(jsonResponse);
-            System.out.println("============");
 
             // 스트림 닫기 및 응답 완료
             writer.flush();
             writer.close();
-            //response.sendRedirect("/");
         } catch (Exception e) {
-            System.out.println("e.getMessage() 뭐가 문젠데 = " + e.getMessage());
+            System.out.println("e.getMessage() = " + e.getMessage());
         }
     }
 }
