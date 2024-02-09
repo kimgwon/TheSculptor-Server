@@ -12,5 +12,6 @@ import java.util.UUID;
 public class FollowSimpleListDto {
     private UUID id;
     private String nickname;
+    private String profileImage;
     private UUID representStoneId;
 }

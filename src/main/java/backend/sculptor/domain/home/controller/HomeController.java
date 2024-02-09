@@ -3,6 +3,7 @@ package backend.sculptor.domain.home.controller;
 import backend.sculptor.domain.follow.dto.FollowSimpleListDto;
 import backend.sculptor.domain.follow.service.FollowService;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
+import backend.sculptor.domain.stone.dto.StoneLikeDTO;
 import backend.sculptor.domain.stone.service.StoneLikeService;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.dto.UserSearchResultDto;
@@ -47,12 +48,13 @@ public class HomeController {
                     continue;
                 }
                 StoneDetailDTO stoneDetailDTO = followService.searchStone(followSimpleListDto.getRepresentStoneId());
-                Boolean pressedLike = stoneLikeService.isPressedLike(userId, stoneDetailDTO.getStoneId());
+                Boolean pressedLike = stoneLikeService.isPressedLike(user.getId(), stoneDetailDTO.getStoneId());
                 Map<String, Object> followerStoneMap = new HashMap<>();
                 followerStoneMap.put("id", followSimpleListDto.getId());
                 followerStoneMap.put("nickname", followSimpleListDto.getNickname());
+                followerStoneMap.put("profileImage", followSimpleListDto.getProfileImage());
                 followerStoneMap.put("stoneDDay", stoneDetailDTO.getDDay());
-                // 달성률 데이터 추가 예정
+                followerStoneMap.put("achieveRate", stoneDetailDTO.getAchRate());
                 followerStoneMap.put("stoneName", stoneDetailDTO.getStoneName());
                 followerStoneMap.put("stoneGoal", stoneDetailDTO.getStoneGoal());
                 followerStoneMap.put("startDate", stoneDetailDTO.getStartDate());
@@ -62,7 +64,8 @@ public class HomeController {
 
                 followerStonesList.add(followerStoneMap);
             }
-            response = APIBody.of(200, "모든 팔로잉 사용자의 모든 돌 조회 성공", followerStonesList);
+
+            response = APIBody.of(200, "모든 팔로잉 사용자의 대표 돌 조회 성공", followerStonesList);
         } catch (Exception e) {
             System.out.println("e.getMessage() = " + e.getMessage());
             response = APIBody.of(400, "조회중 에러 발생 "+e.getMessage(), null);
