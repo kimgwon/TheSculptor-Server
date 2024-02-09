@@ -1,6 +1,9 @@
 package backend.sculptor.domain.stone.service;
 
-import backend.sculptor.domain.stone.dto.*;
+import backend.sculptor.domain.stone.dto.AchieveDTO;
+import backend.sculptor.domain.stone.dto.SculptorResultDTO;
+import backend.sculptor.domain.stone.dto.StoneAchievesListDTO;
+import backend.sculptor.domain.stone.dto.StoneSculptRequest;
 import backend.sculptor.domain.stone.entity.Achieve;
 import backend.sculptor.domain.stone.entity.AchieveStatus;
 import backend.sculptor.domain.stone.entity.Stone;
@@ -8,8 +11,6 @@ import backend.sculptor.domain.stone.repository.AchieveRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
-import backend.sculptor.global.exception.ErrorCode;
-import backend.sculptor.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -156,33 +157,18 @@ public class AchieveService {
                 .orElseThrow(() -> new RuntimeException("돌을 찾을 수 없습니다."));
 
         LocalDate startDate = stone.getStartDate().toLocalDate();
+        LocalDate endDate = stone.getFinalDate().toLocalDate();
         LocalDate today = LocalDate.now();
-        long totalDays = ChronoUnit.DAYS.between(startDate, today) + 1; // 오늘 포함 계산
 
-        // 시작일로부터 오늘까지 AchieveStatus.A 상태인 Achieve 개수
-        long countAStatus = achieveRepository.findAllByStoneIdAndDateBetweenAndAchieveStatus(stoneId, startDate.atStartOfDay(), today.atTime(23, 59), AchieveStatus.A).size();
+        if (endDate.isBefore(today))
+            endDate = today;
+
+        long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1; // 오늘 포함 계산
+
+        // 시작일로부터 계산일까지 AchieveStatus.A 상태인 Achieve 개수
+        long countAStatus = achieveRepository.findAllByStoneIdAndDateBetweenAndAchieveStatus(stoneId, startDate.atStartOfDay(), endDate.atTime(23, 59), AchieveStatus.A).size();
 
         // 달성률 계산
         return Math.round((double) countAStatus / totalDays * 100);
-    }
-
-    //달성률 계산(박물관)
-    public int calculateAchievementRateToFinalDate(UUID stoneId) {
-        Stone stone = stoneRepository.findById(stoneId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.STONE_NOT_FOUND.getMessage()));
-
-        LocalDate startDate = stone.getStartDate().toLocalDate();
-        LocalDate endDate = stone.getFinalDate().toLocalDate();
-
-        // 시작일부터 목표일까지의 기간
-        long totalDays = ChronoUnit.DAYS.between(startDate, endDate);
-        List<Achieve> achieves = achieveRepository.findByStoneId(stoneId);
-        // 달성한 날짜들의 개수
-        long achievedDays = achieves.stream()
-                .filter(achieve -> achieve.getAchieveStatus() == AchieveStatus.A)
-                .count();
-
-        // 달성률 계산
-        return (int) Math.round((double) achievedDays / totalDays * 100);
     }
 }
