@@ -81,6 +81,12 @@ public class StoneService {
 
     }
 
+    // 돌 삭제
+    @Transactional
+    public void delete(Stone stone){
+        stoneRepository.delete(stone);
+    }
+
     //StoneList DTO 변환
     private StoneListDTO convertToStoneDTO(Stone stone) {
         // Stone 엔티티를 StoneDTO로 변환하는 로직
