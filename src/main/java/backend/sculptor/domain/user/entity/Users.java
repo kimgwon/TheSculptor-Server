@@ -22,7 +22,7 @@ public class Users {
     private String role;
     private String nickname;
     private String profileImage;
-    private String userIntroduction;
+    private String introduction;
 
     @Column(nullable = false)
     private Boolean isPublic = true;
@@ -47,4 +47,8 @@ public class Users {
     public void setIsPublic(Boolean isPublic) {
         this.isPublic = isPublic;
     }
+
+    public void setIntroduction(String newIntroduction) {this.introduction = newIntroduction;}
+
+    public void setProfileImage(String newProfileImage) {this.profileImage = newProfileImage;}
 }

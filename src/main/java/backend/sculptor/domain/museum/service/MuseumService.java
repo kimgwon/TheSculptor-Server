@@ -36,7 +36,7 @@ public class MuseumService {
                 .isFollowing(followService.isFollowing(userID, ownerId))
                 .id(ownerId)
                 .nickname(owner.getNickname())
-                .introduction(owner.getUserIntroduction())
+                .introduction(owner.getIntroduction())
                 .profileImage(owner.getProfileImage())
                 .stones(convertToMuseumStones(stones))
                 .followerCount(followService.getFollowerSize(ownerId))
