@@ -42,6 +42,10 @@ public class HomeController {
             List<Map<String, Object>> followerStonesList = new ArrayList<>();
             for (FollowSimpleListDto followSimpleListDto : followingList) {
                 UUID userId = followSimpleListDto.getId();
+                //대표돌 id가 null 일때..
+                if (followSimpleListDto.getRepresentStoneId() == null) {
+                    continue;
+                }
                 StoneDetailDTO stoneDetailDTO = followService.searchStone(followSimpleListDto.getRepresentStoneId());
                 Boolean pressedLike = stoneLikeService.isPressedLike(userId, stoneDetailDTO.getStoneId());
                 Map<String, Object> followerStoneMap = new HashMap<>();
@@ -61,7 +65,7 @@ public class HomeController {
             response = APIBody.of(200, "모든 팔로잉 사용자의 모든 돌 조회 성공", followerStonesList);
         } catch (Exception e) {
             System.out.println("e.getMessage() = " + e.getMessage());
-            response = APIBody.of(400, "조회중 에러 발생", null);
+            response = APIBody.of(400, "조회중 에러 발생 "+e.getMessage(), null);
         }
         return ResponseEntity.ok(response);
     }
