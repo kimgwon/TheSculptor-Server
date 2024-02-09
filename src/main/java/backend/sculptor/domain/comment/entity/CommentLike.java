@@ -16,9 +16,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CommentLike {
     @Id
-    @Builder.Default
+    @GeneratedValue
     @Column(name = "comment_like_id")
-    private UUID id = UUID.randomUUID();
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")

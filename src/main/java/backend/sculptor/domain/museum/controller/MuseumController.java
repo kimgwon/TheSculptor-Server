@@ -2,6 +2,7 @@ package backend.sculptor.domain.museum.controller;
 
 import backend.sculptor.domain.comment.dto.CommentDTO;
 import backend.sculptor.domain.comment.dto.CommentLikeDTO;
+import backend.sculptor.domain.comment.service.CommentLikeService;
 import backend.sculptor.domain.comment.service.CommentService;
 import backend.sculptor.domain.museum.dto.MuseumDTO;
 import backend.sculptor.domain.museum.dto.MuseumDetailDTO;
@@ -29,6 +30,7 @@ public class MuseumController {
     private final MuseumDetailService museumDetailService;
     private final MuseumProfoileService museumProfoileService;
     private final CommentService commentService;
+    private final CommentLikeService commentLikeService;
 
     @GetMapping("/users/{ownerId}")
     public APIBody<MuseumDTO> getMuseumInfo(@CurrentUser SessionUser user, @PathVariable UUID ownerId) {
@@ -68,9 +70,9 @@ public class MuseumController {
     public APIBody<CommentLikeDTO> toggleCommentLike(
             @CurrentUser SessionUser user,
             @PathVariable UUID commentId) {
-        CommentLikeDTO commentLike = commentService.toggleCommentLike(user.getId(), commentId);
+        CommentLikeDTO commentLike = commentLikeService.toggleCommentLike(user.getId(), commentId);
 
-        return APIBody.of(HttpStatus.OK.value(), "좋아요 상태 변경 성공", commentLike);
+        return APIBody.of(HttpStatus.OK.value(), "방명록 좋아요 상태 변경 성공", commentLike);
     }
 
     @GetMapping("/profile/user")

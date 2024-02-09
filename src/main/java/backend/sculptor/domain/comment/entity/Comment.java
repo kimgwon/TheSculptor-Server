@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,9 +21,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Comment {
     @Id
-    @Builder.Default
+    @GeneratedValue
     @Column(name = "comment_id")
-    private UUID id = UUID.randomUUID();
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="stone_id")
@@ -34,9 +35,9 @@ public class Comment {
 
     private String content;
 
-    @Builder.Default
-    private LocalDateTime writeAt = LocalDateTime.now(); // 현재 시간으로 설정
+    @CreationTimestamp
+    private LocalDateTime writeAt;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentLike> likes = new ArrayList<>();
 }

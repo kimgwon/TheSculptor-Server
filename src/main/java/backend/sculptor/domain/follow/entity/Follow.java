@@ -1,9 +1,7 @@
 package backend.sculptor.domain.follow.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
+import backend.sculptor.domain.user.entity.Users;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,15 +15,17 @@ import java.util.UUID;
 @Getter
 public class Follow {
     @Id
-    @Column(name = "to_user", insertable = false, updatable = false)
-    private UUID toUser;
+    @ManyToOne
+    @JoinColumn(name = "to_user", referencedColumnName = "id", insertable = false, updatable = false)
+    private Users toUser;
 
     @Id
-    @Column(name = "from_user", insertable = false, updatable = false)
-    private UUID fromUser;
+    @ManyToOne
+    @JoinColumn(name = "from_user", referencedColumnName = "id", insertable = false, updatable = false)
+    private Users fromUser;
 
     @Builder
-    public Follow(UUID toUser, UUID fromUser) {
+    public Follow(Users toUser, Users fromUser) {
         this.toUser = toUser;
         this.fromUser = fromUser;
     }

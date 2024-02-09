@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FollowRepository extends JpaRepository<Follow, Follow.PK> {
-    Long countByToUser(UUID userId);    // 팔로워 수 (follower)
-    Long countByFromUser(UUID userId);  // 팔로우 수 (following)
+    Long countByToUserId(UUID userId);    // 팔로워 수 (follower)
+    Long countByFromUserId(UUID userId);  // 팔로우 수 (following)
 
     //List<FollowSimpleListDto> findAllByFromUser(UUID userId); // 사용자가 팔로우한 관계를 가져옴
 
@@ -18,8 +18,8 @@ public interface FollowRepository extends JpaRepository<Follow, Follow.PK> {
 //    List<FollowSimpleListDto> findAllByFromUser(@Param("userId") UUID userId);
     //List<FollowSimpleListDto> findAllByToUser(UUID userId);	 // 사용자를 팔로우하는 관계를 가져옴
 
-    List<Follow> findAllByFromUser(UUID userId);
-    List<Follow> findAllByToUser(UUID toUser);
-    Optional<Follow> findByFromUserAndToUser(UUID fromUserId, UUID toUserId);
-    boolean existsByFromUserAndToUser(UUID followerId, UUID followeeId);
+    List<Follow> findAllByFromUserId(UUID userId);
+    List<Follow> findAllByToUserId(UUID toUser);
+    Optional<Follow> findByFromUserIdAndToUserId(UUID fromUserId, UUID toUserId);
+    boolean existsByFromUserIdAndToUserId(UUID followerId, UUID followeeId);
 }

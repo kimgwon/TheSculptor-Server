@@ -47,7 +47,7 @@ public class MuseumDetailService {
                 .isLike(stoneLikeService.isPressedLike(userId, stone.getId()))
                 .dDay(stoneService.calculateDate(startDate.toLocalDate()))
                 .powder(stone.getPowder())
-                .achievementRate(achieveService.calculateAchievementRateToFinalDate(stone.getId()))
+                .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
                 .achievementCounts(achieveService.achievementCountsByStoneId(stone.getId()))
                 .build();
     }
