@@ -27,8 +27,10 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         );
 
         // JSON 응답 전송
+        System.out.println("============");
         PrintWriter writer = response.getWriter();
         writer.write(jsonResponse);
+        System.out.println("============");
 
         // 스트림 닫기 및 응답 완료
         writer.flush();
