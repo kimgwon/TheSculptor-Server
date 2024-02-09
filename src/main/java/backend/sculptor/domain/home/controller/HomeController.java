@@ -125,16 +125,16 @@ public class HomeController {
     }
 
     @PostMapping("/{stoneId}/like")
-    public ResponseEntity<?> pressLike(@CurrentUser SessionUser user,
-                                       @PathVariable("stoneId") UUID stoneId) {
-        Boolean result = stoneLikeService.pressLikeToStone(stoneId, user.getId());
-        if(result) {
-            Map<String, String> data = new HashMap<>();
-            data.put("stoneId", stoneId.toString());
-            data.put("userId", user.getId().toString());
-            return ResponseEntity.ok(APIBody.of(200, "좋아요 누르기 성공", data));
-        } else {
-            return ResponseEntity.badRequest().body(APIBody.of(400, "좋아요 누르기 실패", null));
+    public ResponseEntity<?> toggleLike(@CurrentUser SessionUser user,
+                                        @PathVariable("stoneId") UUID stoneId) {
+
+        try {
+            userService.findUser(user.getId());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(APIBody.of(400, "해당 사용자가 존재하지 않습니다", null));
         }
+
+        StoneLikeDTO result = stoneLikeService.toggleLikeToStone(stoneId, userService.findUser(user.getId()));
+        return ResponseEntity.ok(APIBody.of(200, "좋아요 상태 변경 성공", result));
     }
 }
