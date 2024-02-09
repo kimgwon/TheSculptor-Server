@@ -117,7 +117,7 @@ public class StoneService {
                 achRate,
                 stone.getPowder(),
                 stone.getStatus(),
-                stone.getStoneLike()
+                stone.getLikes().size()
         );
 
     }

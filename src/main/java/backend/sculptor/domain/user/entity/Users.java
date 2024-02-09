@@ -1,5 +1,6 @@
 package backend.sculptor.domain.user.entity;
 
+import backend.sculptor.domain.follow.entity.Follow;
 import backend.sculptor.domain.stone.entity.Stone;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -29,8 +30,14 @@ public class Users {
 
     private UUID representStoneId;
 
-    @OneToMany(mappedBy="users")
+    @OneToMany(mappedBy="users", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private final List<Stone> stones = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Follow> followers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Follow> following = new ArrayList<>();
 
     @Builder
     public Users(String name, String role, String nickname, String profileImage) {

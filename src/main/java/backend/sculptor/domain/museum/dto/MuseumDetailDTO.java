@@ -28,7 +28,7 @@ public final class MuseumDetailDTO {
         private String dDay;
         private Integer powder;
         private Boolean isLike;
-        private Integer achievementRate;
+        private Long achievementRate;
         private Map<String, Long> achievementCounts;
 
         @JsonProperty("dDay")

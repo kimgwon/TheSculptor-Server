@@ -16,15 +16,17 @@ public class StoneLikes {
     @GeneratedValue
     private UUID id;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stone_id")
+    private Stone stone;
 
-    @Column(name = "stone_id")
-    private UUID stoneId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users user;
 
     @Builder
-    public StoneLikes(UUID stoneId, UUID userId) {
-        this.stoneId = stoneId;
-        this.userId = userId;
+    public StoneLikes(Stone stone, Users user) {
+        this.stone = stone;
+        this.user = user;
     }
 }

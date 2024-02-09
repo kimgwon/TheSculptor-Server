@@ -42,26 +42,27 @@ public class Stone {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private int stoneLike;
-
 //    @OneToMany(mappedBy = "stones")
 //    private List<Status> statuses;
+
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StoneLikes> likes = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Setter
     private StoneStatus status = StoneStatus.BASIC;
 
-    @OneToMany(mappedBy = "stone")
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StoneItem> stoneItems = new ArrayList<>();
 
-    @OneToMany(mappedBy = "stone")
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
 //    @OneToOne
 //    @JoinColumn(name="achieve_id")
 //    private Achieve achieve;
 
-    @OneToMany(mappedBy = "stone", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Achieve> achieves = new ArrayList<>();
 
     @Setter
@@ -81,7 +82,5 @@ public class Stone {
         this.startDate = startDate;
         this.finalDate = startDate.plusDays(65);
     }
-
-
 
 }

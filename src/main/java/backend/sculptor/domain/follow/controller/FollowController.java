@@ -25,14 +25,17 @@ public class FollowController {
     public ResponseEntity<?> follow(@CurrentUser SessionUser user,
                                     @RequestParam UUID followId) {
         APIBody<Map<String, Object>> responseBody;
+        Users fromUser;
+        Users toUser;
         try {
-            Users targetUser = userService.findUser(followId);
+            fromUser = userService.findUser(user.getId());
+            toUser = userService.findUser(followId);
         } catch (Exception e) {
             responseBody = APIBody.of(400, "해당 사용자가 존재하지 않습니다", null);
             return ResponseEntity.badRequest().body(responseBody);
         }
 
-        boolean isFollowing = followService.toggleFollow(user.getId(), followId);
+        boolean isFollowing = followService.toggleFollow(fromUser, toUser);
         Map<String, Object> data = new HashMap<>();
 
         data.put("fromUser", user.getId());
