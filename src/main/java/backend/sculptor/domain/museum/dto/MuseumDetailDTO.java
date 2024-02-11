@@ -27,6 +27,7 @@ public final class MuseumDetailDTO {
         private String oneComment;
         private String dDay;
         private Integer powder;
+        private Boolean isRepresent;
         private Boolean isLike;
         private Long achievementRate;
         private Map<String, Long> achievementCounts;

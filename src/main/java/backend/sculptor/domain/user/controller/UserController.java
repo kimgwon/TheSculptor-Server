@@ -1,16 +1,14 @@
 package backend.sculptor.domain.user.controller;
 
-import backend.sculptor.domain.stone.dto.ItemDTO;
 import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.entity.Stone;
-import backend.sculptor.domain.stone.entity.StoneItem;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.domain.user.entity.Users;
-import backend.sculptor.global.api.APIBody;
-import backend.sculptor.global.oauth.annotation.CurrentUser;
 import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.user.service.UserService;
+import backend.sculptor.global.api.APIBody;
+import backend.sculptor.global.oauth.annotation.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -162,5 +160,17 @@ public class UserController {
             APIBody<String> response = APIBody.of(400, "세션이 존재하지 않음", null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+    }
+
+    @PatchMapping("/user/represent-stone/{stoneId}")
+    public APIBody<Map<String, UUID>> setRepresentStone(
+            @CurrentUser SessionUser user,
+            @PathVariable UUID stoneId) {
+        Stone stone = stoneService.getStoneByUserIdAndStoneId(user.getId(), stoneId);
+        UUID representStoneId = userService.setRepresentStone(user.getId(), stone);
+        Map<String, UUID> data = new HashMap<>();
+        data.put("id", representStoneId);
+
+        return APIBody.of(HttpStatus.OK.value(), "대표 돌 설정 성공", data);
     }
 }

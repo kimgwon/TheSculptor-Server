@@ -1,14 +1,15 @@
 package backend.sculptor.domain.user.service;
 
+import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
+import backend.sculptor.global.exception.ErrorCode;
+import backend.sculptor.global.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +38,23 @@ public class UserService {
     public List<Users> searchUser(String username) {
         List<Users> findUserList = userRepository.findByNameOrNickname(username, username);
         return findUserList;
+    }
+
+    @Transactional
+    public UUID setRepresentStone(UUID userId, Stone stone) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        if (user.getRepresentStone() != null && user.getRepresentStone().getId().equals(stone.getId())) {
+            user.setRepresentStone(null);
+            userRepository.save(user);
+            return null;
+        }
+
+        // 사용자의 대표 돌을 설정합니다.
+        user.setRepresentStone(stone);
+        userRepository.save(user);
+
+        return user.getRepresentStone().getId();
     }
 }

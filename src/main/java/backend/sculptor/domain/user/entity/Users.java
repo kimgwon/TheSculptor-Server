@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +23,18 @@ public class Users {
     private String name;
     private String role;
     private String nickname;
+    @Setter
     private String profileImage;
+    @Setter
     private String introduction;
 
     @Column(nullable = false)
     private Boolean isPublic = true;
 
-    private UUID representStoneId;
+    @Setter
+    @OneToOne
+    @JoinColumn(name = "represent_stone_id")
+    private Stone representStone;
 
     @OneToMany(mappedBy="users", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private final List<Stone> stones = new ArrayList<>();
@@ -55,7 +61,4 @@ public class Users {
         this.isPublic = isPublic;
     }
 
-    public void setIntroduction(String newIntroduction) {this.introduction = newIntroduction;}
-
-    public void setProfileImage(String newProfileImage) {this.profileImage = newProfileImage;}
 }
