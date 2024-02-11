@@ -1,5 +1,6 @@
 package backend.sculptor.domain.user.controller;
 
+import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.StoneService;
@@ -121,7 +122,8 @@ public class UserController {
         }
 
         Users findUser = userService.findUser(user.getId());
-        List<Stone> stones = findUser.getStones();
+        List<StoneListDTO> stones = stoneService.getStonesByCategory(user.getId(), null);
+        //List<Stone> stones = findUser.getStones();
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("user_id", user.getId().toString());
