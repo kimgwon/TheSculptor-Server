@@ -93,7 +93,7 @@ public class MuseumController {
     }
 
     @PatchMapping("/profile/user")
-    public APIBody<MuseumProfileDTO.User> editMuseumProfile(
+    public APIBody<MuseumProfileDTO.User> editMuseumProfileUser(
             @CurrentUser SessionUser user,
             @RequestBody MuseumProfileDTO.User userProfile) {
         MuseumProfileDTO.User editUser = museumProfoileService.editProfile(user.getId(), userProfile);
@@ -101,10 +101,10 @@ public class MuseumController {
     }
 
     @DeleteMapping("/profile/stones/{stoneId}")
-    public APIBody<MuseumProfileDTO.User> editMuseumProfile(
+    public APIBody<MuseumProfileDTO.User> deleteMuseumProfileStone(
             @CurrentUser SessionUser user,
             @PathVariable UUID stoneId) {
-        museumProfoileService.deleteStoneFromProfile(user.getId(), stoneId);
+        museumProfoileService.deleteStone(user.getId(), stoneId);
         return APIBody.of(200, "박물관 돌 삭제 성공", null);
     }
 }
