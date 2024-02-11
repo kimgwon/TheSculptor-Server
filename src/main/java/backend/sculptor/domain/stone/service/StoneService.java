@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -289,8 +290,9 @@ public class StoneService {
     }
 
 
-    public List<StoneItem> findAllStoneItem(Stone stone) {
-        List<StoneItem> result = stoneItemRepository.findAllByStone(stone);
+    public List<StoneItem> findAllStoneItem(StoneListDTO stone) {
+        Stone findStone = stoneRepository.findById(stone.getStoneId()).orElseThrow(NoSuchElementException::new);
+        List<StoneItem> result = stoneItemRepository.findAllByStone(findStone);
         return result;
     }
 
