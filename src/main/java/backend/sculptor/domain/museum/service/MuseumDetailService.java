@@ -7,6 +7,7 @@ import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.AchieveService;
 import backend.sculptor.domain.stone.service.StoneLikeService;
 import backend.sculptor.domain.stone.service.StoneService;
+import backend.sculptor.domain.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class MuseumDetailService {
+    private final UserService userService;
     private final StoneService stoneService;
     private final StoneLikeService stoneLikeService;
     private final CommentService commentService;
@@ -45,6 +47,7 @@ public class MuseumDetailService {
                 .startDate(startDate)
                 .oneComment(stone.getOneComment())
                 .isLike(stoneLikeService.isPressedLike(userId, stone.getId()))
+                .isRepresent(userService.isRepresentStone(userId, stone))
                 .dDay(stoneService.calculateDate(startDate.toLocalDate()))
                 .powder(stone.getPowder())
                 .achievementRate(achieveService.calculateAchievementRate(stone.getId()))

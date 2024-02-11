@@ -58,4 +58,11 @@ public class UserService {
 
         return user.getRepresentStone().getId();
     }
+
+    public Boolean isRepresentStone(UUID userId, Stone stone) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        return user.getRepresentStone() != null && user.getRepresentStone().getId().equals(stone.getId());
+    }
 }

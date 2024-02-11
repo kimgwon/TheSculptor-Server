@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,8 +34,8 @@ public class Comment {
 
     private String content;
 
-    @CreationTimestamp
-    private LocalDateTime writeAt;
+    @Builder.Default
+    private LocalDateTime writeAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentLike> likes = new ArrayList<>();
