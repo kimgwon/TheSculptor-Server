@@ -81,6 +81,18 @@ public class StoneService {
 
     }
 
+    @Transactional
+    public void deleteStone(UUID userId, UUID stoneId) {
+        Stone stone = getStoneByUserIdAndStoneId(userId, stoneId);
+        Users user = userRepository.findById(userId)
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        if (stone.equals(user.getRepresentStone()))
+            user.setRepresentStone(null);
+
+        delete(stone);
+    }
+
     // 돌 삭제
     @Transactional
     public void delete(Stone stone){
@@ -145,6 +157,19 @@ public class StoneService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 돌을 찾을 수 없습니다. ID: " + stoneId));
     }
 
+    public Stone getStoneByUserIdAndStoneId(UUID userId, UUID stoneId) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        Stone stone = stoneRepository.findById(stoneId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.STONE_NOT_FOUND.getMessage()));
+
+        if (!userId.equals(stone.getUsers().getId())) {
+            throw new BadRequestException(ErrorCode.NOT_USER_STONE.getMessage());
+        }
+
+        return stone;
+    }
 
     // 목표일 이후 날짜의 돌 하나 조회 (박물관)
     public Stone getStoneByStoneIdAfterFinalDate(UUID stoneId) {
