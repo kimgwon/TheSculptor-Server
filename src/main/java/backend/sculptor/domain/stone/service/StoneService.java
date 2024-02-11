@@ -1,5 +1,6 @@
 package backend.sculptor.domain.stone.service;
 
+import backend.sculptor.domain.home.dto.UserRepresentStone;
 import backend.sculptor.domain.stone.dto.StoneCreateRequest;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
@@ -294,6 +295,16 @@ public class StoneService {
         return result;
     }
 
+    public UserRepresentStone.Stone convertToUserRepresenstStone(Stone stone) {
+        return UserRepresentStone.Stone.builder()
+                .id(stone.getId())
+                .name(stone.getStoneName())
+                .goal(stone.getStoneGoal())
+                .startDate(stone.getStartDate())
+                .dDay(calculateDate(stone.getStartDate().toLocalDate()))
+                .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
+                .build();
+    }
 }
 
 
