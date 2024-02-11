@@ -1,16 +1,15 @@
 package backend.sculptor.domain.stone.controller;
 
+import backend.sculptor.domain.museum.dto.MuseumProfileDTO;
 import backend.sculptor.domain.stone.dto.StoneCreateRequest;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Category;
-import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -60,6 +59,15 @@ public class StoneController {
             // 기타 서버 오류
             return APIBody.of(500, "서버 오류 발생: " + e.getMessage(), null);
         }
+    }
+
+    // [DELETE] 돌 하나 삭제
+    @DeleteMapping("/stones/{stoneId}/delete")
+    public APIBody<MuseumProfileDTO.User> deleteStone(
+            @CurrentUser SessionUser user,
+            @PathVariable UUID stoneId) {
+        stoneService.deleteStone(user.getId(), stoneId);
+        return APIBody.of(200, "공방 돌 삭제 성공", null);
     }
 
     //[POST] 돌 생성하기

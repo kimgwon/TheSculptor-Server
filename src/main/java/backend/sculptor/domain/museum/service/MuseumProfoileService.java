@@ -89,14 +89,19 @@ public class MuseumProfoileService {
     }
 
     @Transactional
-    public void deleteStoneFromProfile(UUID userId, UUID stoneId) {
-        Stone stone = stoneService.getStoneByStoneIdAfterFinalDate(stoneId);
+    public void deleteStone(UUID userId, UUID stoneId) {
+        Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
 
-        if (userId.equals(stone.getUsers().getId())) {
-            // 사용자 프로필에서 돌 삭제
-            stoneService.delete(stone);
-        } else{
-            throw new BadRequestException(ErrorCode.NOT_USER_STONE.getMessage());
+        if (stone.getFinalDate().isAfter(LocalDateTime.now())) {
+            throw new BadRequestException(ErrorCode.STONE_NOT_COMPLETE.getMessage());
         }
+
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+        if (stone.equals(user.getRepresentStone()))
+            user.setRepresentStone(null);
+
+        stoneService.delete(stone);
     }
 }
