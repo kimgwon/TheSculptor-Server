@@ -54,7 +54,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACTION_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_ACTION_SECRET_ACCESS_KEY }}
           application_name: the-sculptor # 원하는 어플 이름
-          environment_name: the-sculptor-env # 원하는 환경 이름
+          environment_name: The-sculptor-env # 원하는 환경 이름
           version_label: github-action-${{ steps.current-time.outputs.formattedTime }}
           region: ap-northeast-1
           deployment_package: deploy/deploy.zip
