@@ -3,8 +3,10 @@ package backend.sculptor.domain.stone.entity;
 import backend.sculptor.domain.comment.entity.Comment;
 import backend.sculptor.domain.user.entity.Users;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -25,8 +27,6 @@ public class Stone {
     @JoinColumn(name = "user_id")
     private Users users;
 
-    //아직 유저 엔티티에 매핑안함. @OneToMany 안함
-
     private String stoneName;
     private String stoneGoal;
     private String oneComment;
@@ -34,6 +34,7 @@ public class Stone {
     @Enumerated(EnumType.STRING)
     private Category category; //enum
 
+    @Setter
     private int powder;
 
     private LocalDateTime startDate;
@@ -41,27 +42,45 @@ public class Stone {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    private int stoneLike;
+//    @OneToMany(mappedBy = "stones")
+//    private List<Status> statuses;
 
-    @OneToMany(mappedBy = "stones")
-    private List<Status> statuses;
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StoneLikes> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "stone")
+    @Enumerated(EnumType.STRING)
+    @Setter
+    private StoneStatus status = StoneStatus.BASIC;
+
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StoneItem> stoneItems = new ArrayList<>();
 
-    @OneToMany(mappedBy = "stone")
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToOne
-    @JoinColumn(name="achieve_id")
-    private Achieve achieve;
+//    @OneToOne
+//    @JoinColumn(name="achieve_id")
+//    private Achieve achieve;
+
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Achieve> achieves = new ArrayList<>();
+
+    @Setter
+    private LocalDateTime lastManualChange;
 
     /*
     //갱신일
     private LocalDateTime updated_at;
      */
 
-
-
+    @Builder
+    public Stone(Users users,String stoneName, Category category, String stoneGoal, LocalDateTime startDate){
+        this.users = users;
+        this.stoneName = stoneName;
+        this.category = category;
+        this.stoneGoal = stoneGoal;
+        this.startDate = startDate;
+        this.finalDate = startDate.plusDays(65);
+    }
 
 }

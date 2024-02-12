@@ -1,13 +1,15 @@
 package backend.sculptor.domain.user.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import backend.sculptor.domain.follow.entity.Follow;
+import backend.sculptor.domain.stone.entity.Stone;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -21,12 +23,27 @@ public class Users {
     private String name;
     private String role;
     private String nickname;
+    @Setter
     private String profileImage;
+    @Setter
+    private String introduction;
 
     @Column(nullable = false)
     private Boolean isPublic = true;
 
-    private UUID representStoneId;
+    @Setter
+    @OneToOne
+    @JoinColumn(name = "represent_stone_id")
+    private Stone representStone;
+
+    @OneToMany(mappedBy="users", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private final List<Stone> stones = new ArrayList<>();
+
+    @OneToMany(mappedBy = "toUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Follow> followers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "fromUser", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Follow> following = new ArrayList<>();
 
     @Builder
     public Users(String name, String role, String nickname, String profileImage) {
@@ -43,4 +60,5 @@ public class Users {
     public void setIsPublic(Boolean isPublic) {
         this.isPublic = isPublic;
     }
+
 }

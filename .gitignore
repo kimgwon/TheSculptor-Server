@@ -128,7 +128,7 @@ fabric.properties
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.nar
 *.ear
@@ -177,4 +177,4 @@ Temporary Items
 
 *.bin
 *.lock
-.gradle
+#.gradle
