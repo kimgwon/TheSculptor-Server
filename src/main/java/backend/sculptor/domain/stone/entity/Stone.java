@@ -36,6 +36,12 @@ public class Stone {
 
     @Setter
     private int powder;
+    public void updatePowder(int addPowder) {
+        this.powder += addPowder;
+        if (users != null) {
+            users.updateTotalPowder(addPowder); // User 엔티티에 있는 totalPowder를 업데이트하는 메서드 호출
+        }
+    }
 
     private LocalDateTime startDate;
     private LocalDateTime finalDate;

@@ -137,7 +137,7 @@ public class AchieveService {
         }
 
         // Stone 엔티티의 powder 값을 업데이트
-        stone.setPowder(stone.getPowder() + powderToAdd);
+        stone.updatePowder(powderToAdd);
 
         Achieve achieve = Achieve.builder()
                 .stone(stone)
