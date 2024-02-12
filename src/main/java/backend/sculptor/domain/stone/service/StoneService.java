@@ -48,12 +48,11 @@ public class StoneService {
     }
 
     // 목표일 이후 날짜의 돌 전체 조회 (박물관)
-    public List<StoneListDTO> getStonesByUserIdAfterFinalDate(UUID userId) {
+    public List<Stone> getStonesByUserIdAfterFinalDate(UUID userId) {
         List<Stone> stones = stoneRepository.findByUsersId(userId);
         LocalDateTime currentDate = LocalDateTime.now();
         return stones.stream()
                 .filter(stone -> stone.getFinalDate().isBefore(currentDate)) // 목표일 이후인 돌만 필터링
-                .map(this::convertToStoneDTO)
                 .toList();
     }
 
