@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Builder
-public class StoreStones {
+public final class StoreStones {
     private List<Stone> stones;
 
     @Getter

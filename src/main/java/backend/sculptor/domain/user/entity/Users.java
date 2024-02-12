@@ -2,6 +2,8 @@ package backend.sculptor.domain.user.entity;
 
 import backend.sculptor.domain.follow.entity.Follow;
 import backend.sculptor.domain.stone.entity.Stone;
+import backend.sculptor.global.exception.BadRequestException;
+import backend.sculptor.global.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +32,14 @@ public class Users {
 
     @Column(nullable = false)
     private Boolean isPublic = true;
+
+    @Setter
+    private int totalPowder;
+    public void updateTotalPowder(int addPowder){
+        if (this.totalPowder+addPowder < 0)
+            throw new BadRequestException(ErrorCode.USER_POWDER_NOT_ENOUGH.getMessage());
+        this.totalPowder += addPowder;
+    }
 
     @Setter
     @OneToOne
