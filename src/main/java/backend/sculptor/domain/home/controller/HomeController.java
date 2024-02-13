@@ -81,6 +81,7 @@ public class HomeController {
                 followerStoneMap.put("profileImage", followSimpleListDto.getProfileImage());
                 followerStoneMap.put("stoneDDay", stoneDetailDTO.getDDay());
                 followerStoneMap.put("achieveRate", stoneDetailDTO.getAchRate());
+                followerStoneMap.put("stoneId", stoneDetailDTO.getStoneId());
                 followerStoneMap.put("stoneName", stoneDetailDTO.getStoneName());
                 followerStoneMap.put("stoneGoal", stoneDetailDTO.getStoneGoal());
                 followerStoneMap.put("startDate", stoneDetailDTO.getStartDate());
@@ -119,6 +120,7 @@ public class HomeController {
             stoneDetails.put("stoneDDay", stone.getDDay());
             stoneDetails.put("stoneGoal", stone.getStoneGoal());
             stoneDetails.put("stoneStartDate", stone.getStartDate());
+            stoneDetails.put("achieveRate", stone.getAchRate());
 
             stoneInfo.add(stoneDetails);
             responseBody = APIBody.of(200, "친구 조각상 조회 성공", stoneInfo);
