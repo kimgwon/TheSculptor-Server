@@ -104,12 +104,11 @@ public class HomeController {
     public ResponseEntity<?> showFollowingsStones(@CurrentUser SessionUser user,
                                                   @PathVariable("userId") UUID userId,
                                                   @PathVariable("stoneId") UUID stoneId) {
-        APIBody<List<Map<String, Object>>> responseBody;
+        APIBody<Map<String, Object>> responseBody;
         try {
             Users findUser = userService.findUser(userId);
             StoneDetailDTO stone = stoneService.getStoneByStoneId(userId, stoneId);
 
-            List<Map<String, Object>> stoneInfo = new ArrayList<>();
             Map<String, Object> stoneDetails = new HashMap<>();
             stoneDetails.put("userId", findUser.getId());
             stoneDetails.put("userName", findUser.getName());
@@ -122,8 +121,7 @@ public class HomeController {
             stoneDetails.put("stoneStartDate", stone.getStartDate());
             stoneDetails.put("achieveRate", stone.getAchRate());
 
-            stoneInfo.add(stoneDetails);
-            responseBody = APIBody.of(200, "친구 조각상 조회 성공", stoneInfo);
+            responseBody = APIBody.of(200, "친구 조각상 조회 성공", stoneDetails);
 
         } catch (NoSuchElementException e) {
             responseBody = APIBody.of(400, "사용자 ID, 돌 ID 에러", null);
