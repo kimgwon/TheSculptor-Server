@@ -81,6 +81,7 @@ public class HomeController {
                 followerStoneMap.put("profileImage", followSimpleListDto.getProfileImage());
                 followerStoneMap.put("stoneDDay", stoneDetailDTO.getDDay());
                 followerStoneMap.put("achieveRate", stoneDetailDTO.getAchRate());
+                followerStoneMap.put("stoneId", stoneDetailDTO.getStoneId());
                 followerStoneMap.put("stoneName", stoneDetailDTO.getStoneName());
                 followerStoneMap.put("stoneGoal", stoneDetailDTO.getStoneGoal());
                 followerStoneMap.put("startDate", stoneDetailDTO.getStartDate());
