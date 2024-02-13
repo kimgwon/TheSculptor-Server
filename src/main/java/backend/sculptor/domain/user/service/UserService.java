@@ -40,6 +40,10 @@ public class UserService {
         return findUserList;
     }
 
+    public UUID getRepresentStoneId(Users user) {
+        return (user.getRepresentStone() != null) ? user.getRepresentStone().getId() : null;
+    }
+
     @Transactional
     public UUID setRepresentStone(UUID userId, Stone stone) {
         Users user = userRepository.findById(userId)
