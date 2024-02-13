@@ -2,6 +2,7 @@ package backend.sculptor.domain.home.controller;
 
 import backend.sculptor.domain.follow.dto.FollowSimpleListDto;
 import backend.sculptor.domain.follow.service.FollowService;
+import backend.sculptor.domain.home.dto.FollowingRepresentStone;
 import backend.sculptor.domain.home.dto.UserRepresentStone;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneLikeDTO;
@@ -100,35 +101,41 @@ public class HomeController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/followings/{userId}/stones/{stoneId}")
-    public ResponseEntity<?> showFollowingsStones(@CurrentUser SessionUser user,
-                                                  @PathVariable("userId") UUID userId,
-                                                  @PathVariable("stoneId") UUID stoneId) {
-        APIBody<Map<String, Object>> responseBody;
+    @GetMapping("/followings/{userId}/represent-stone")
+    public APIBody<FollowingRepresentStone> showFollowingRepresentStone(
+            @CurrentUser SessionUser user,
+            @PathVariable("userId") UUID userId
+    ) {
         try {
             Users findUser = userService.findUser(userId);
-            StoneDetailDTO stone = stoneService.getStoneByStoneId(userId, stoneId);
+            UUID representStoneId = userService.getRepresentStoneId(findUser);
+            FollowingRepresentStone.Stone representStone;
 
-            Map<String, Object> stoneDetails = new HashMap<>();
-            stoneDetails.put("userId", findUser.getId());
-            stoneDetails.put("userName", findUser.getName());
-            stoneDetails.put("userProfileUrl", findUser.getProfileImage());
-            // 이하 stone의 상세 정보 추가
-            stoneDetails.put("stoneId", stone.getStoneId());
-            stoneDetails.put("stoneName", stone.getStoneName());
-            stoneDetails.put("stoneDDay", stone.getDDay());
-            stoneDetails.put("stoneGoal", stone.getStoneGoal());
-            stoneDetails.put("stoneStartDate", stone.getStartDate());
-            stoneDetails.put("achieveRate", stone.getAchRate());
+            if (representStoneId == null) {
+                representStone = null;
+            } else {
+                StoneDetailDTO stoneDetailDTO = followService.searchStone(representStoneId);
+                representStone = FollowingRepresentStone.Stone.builder()
+                        .id(stoneDetailDTO.getStoneId())
+                        .name(stoneDetailDTO.getStoneName())
+                        .achievementRate(stoneDetailDTO.getAchRate())
+                        .dDay(stoneDetailDTO.getDDay())
+                        .startDate(stoneDetailDTO.getStartDate())
+                        .goal(stoneDetailDTO.getStoneGoal())
+                        .build();
+            }
 
-            responseBody = APIBody.of(200, "친구 조각상 조회 성공", stoneDetails);
+            return APIBody.of(200, "친구 조각상 조회 성공",
+                    FollowingRepresentStone.builder()
+                            .id(findUser.getId())
+                            .nickname(findUser.getNickname())
+                            .isFollowing(followService.isFollowing(user.getId(), findUser.getId()))
+                            .stone(representStone)
+                            .build());
 
         } catch (NoSuchElementException e) {
-            responseBody = APIBody.of(400, "사용자 ID, 돌 ID 에러", null);
-            return ResponseEntity.badRequest().body(responseBody);
+            return APIBody.of(400, "사용자 ID, 돌 ID 에러", null);
         }
-
-        return ResponseEntity.ok(responseBody);
     }
 
     @GetMapping("/users/search")
