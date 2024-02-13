@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface StoneItemRepository extends JpaRepository<StoneItem, UUID> {
     List<StoneItem> findAllByStone(Stone stone);
+
+    List<StoneItem> findByStoneId(UUID stoneId);
 }

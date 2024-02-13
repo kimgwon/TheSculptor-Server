@@ -296,6 +296,10 @@ public class StoneService {
         return result;
     }
 
+    public List<StoneItem> findStoneItems(UUID stoneId) {
+        return stoneItemRepository.findByStoneId(stoneId);
+    }
+
 }
 
 
