@@ -15,6 +15,7 @@ import java.util.UUID;
 public class FollowingRepresentStone {
     private UUID id;
     private String nickname;
+    private String profileImage;
     private Boolean isFollowing;
     private Stone stone;
 
