@@ -290,7 +290,7 @@ public class StoneService {
     }
 
 
-    public List<StoneItem> findAllStoneItem(Stone stone) {
+    public List<StoneItem> findAllStoneItem(StoneListDTO stone) {
         List<StoneItem> result = stoneItemRepository.findAllByStone(stone);
         return result;
     }
@@ -304,6 +304,10 @@ public class StoneService {
                 .dDay(calculateDate(stone.getStartDate().toLocalDate()))
                 .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
                 .build();
+    }
+
+    public List<StoneItem> findStoneItems(UUID stoneId) {
+        return stoneItemRepository.findAllByStoneId(stoneId);
     }
 }
 
