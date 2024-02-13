@@ -1,5 +1,6 @@
 package backend.sculptor.domain.stone.service;
 
+import backend.sculptor.domain.home.dto.UserRepresentStone;
 import backend.sculptor.domain.stone.dto.StoneCreateRequest;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneListDTO;
@@ -21,7 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,12 +48,11 @@ public class StoneService {
     }
 
     // 목표일 이후 날짜의 돌 전체 조회 (박물관)
-    public List<StoneListDTO> getStonesByUserIdAfterFinalDate(UUID userId) {
+    public List<Stone> getStonesByUserIdAfterFinalDate(UUID userId) {
         List<Stone> stones = stoneRepository.findByUsersId(userId);
         LocalDateTime currentDate = LocalDateTime.now();
         return stones.stream()
                 .filter(stone -> stone.getFinalDate().isBefore(currentDate)) // 목표일 이후인 돌만 필터링
-                .map(this::convertToStoneDTO)
                 .toList();
     }
 
@@ -263,7 +262,8 @@ public class StoneService {
 
         // 조건을 만족하는 경우, 돌 상태 업데이트 및 포인트 차감
         stone.setStatus(StoneStatus.BASIC);
-        stone.setPowder(stone.getPowder() - mossRemovalCost);
+        stone.updatePowder(mossRemovalCost);
+
         stone.setLastManualChange(LocalDateTime.now());
         stoneRepository.save(stone);
     }
@@ -284,22 +284,27 @@ public class StoneService {
         }
 
         stone.setStatus(StoneStatus.BASIC);
-        stone.setPowder(stone.getPowder() - crackRepairCost);
+        stone.updatePowder(crackRepairCost);
         stone.setLastManualChange(LocalDateTime.now()); // 마지막 수동 변경 시간 기록
         stoneRepository.save(stone);
     }
 
 
-    public List<StoneItem> findAllStoneItem(StoneListDTO stone) {
-        Stone findStone = stoneRepository.findById(stone.getStoneId()).orElseThrow(NoSuchElementException::new);
-        List<StoneItem> result = stoneItemRepository.findAllByStone(findStone);
+    public List<StoneItem> findAllStoneItem(Stone stone) {
+        List<StoneItem> result = stoneItemRepository.findAllByStone(stone);
         return result;
     }
 
-    public List<StoneItem> findStoneItems(UUID stoneId) {
-        return stoneItemRepository.findByStoneId(stoneId);
+    public UserRepresentStone.Stone convertToUserRepresenstStone(Stone stone) {
+        return UserRepresentStone.Stone.builder()
+                .id(stone.getId())
+                .name(stone.getStoneName())
+                .goal(stone.getStoneGoal())
+                .startDate(stone.getStartDate())
+                .dDay(calculateDate(stone.getStartDate().toLocalDate()))
+                .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
+                .build();
     }
-
 }
 
 
