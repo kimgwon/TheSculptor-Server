@@ -129,6 +129,7 @@ public class HomeController {
                     FollowingRepresentStone.builder()
                             .id(findUser.getId())
                             .nickname(findUser.getNickname())
+                            .profileImage(findUser.getProfileImage())
                             .isFollowing(followService.isFollowing(user.getId(), findUser.getId()))
                             .stone(representStone)
                             .build());
