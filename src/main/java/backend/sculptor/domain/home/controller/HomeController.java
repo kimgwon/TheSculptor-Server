@@ -2,8 +2,10 @@ package backend.sculptor.domain.home.controller;
 
 import backend.sculptor.domain.follow.dto.FollowSimpleListDto;
 import backend.sculptor.domain.follow.service.FollowService;
+import backend.sculptor.domain.home.dto.UserRepresentStone;
 import backend.sculptor.domain.stone.dto.StoneDetailDTO;
 import backend.sculptor.domain.stone.dto.StoneLikeDTO;
+import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.StoneLikeService;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.dto.UserSearchResultDto;
@@ -11,25 +13,49 @@ import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.service.UserService;
 import backend.sculptor.global.api.APIBody;
+import backend.sculptor.global.exception.ErrorCode;
+import backend.sculptor.global.exception.NotFoundException;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class HomeController {
     private final FollowService followService;
     private final UserService userService;
     private final StoneService stoneService;
     private final StoneLikeService stoneLikeService;
+
+    @GetMapping("/users/represent-stone")
+    public APIBody<?> showRepresentStone(@CurrentUser SessionUser currentUser) {
+        try {
+            Users user = userService.findUser(currentUser.getId());
+            Stone representStone = user.getRepresentStone();
+
+            if (representStone==null) {
+                return APIBody.of(200, "대표 돌이 없습니다.",
+                        UserRepresentStone.builder()
+                                .id(user.getId())
+                                .name(user.getName())
+                                .stone(null)
+                                .build());
+            }
+
+            return APIBody.of(200, "대표 돌 조회 성공",
+                    UserRepresentStone.builder()
+                            .id(user.getId())
+                            .name(user.getName())
+                            .stone(stoneService.convertToUserRepresenstStone(representStone))
+                            .build());
+        }catch (NoSuchElementException e){
+            throw new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage());
+        }
+    }
 
     @GetMapping("/followings/stones")
     public ResponseEntity<?> showAllFollowingsStones(@CurrentUser SessionUser user) {
@@ -128,7 +154,6 @@ public class HomeController {
     @PostMapping("/{stoneId}/like")
     public ResponseEntity<?> toggleLike(@CurrentUser SessionUser user,
                                         @PathVariable("stoneId") UUID stoneId) {
-
         try {
             userService.findUser(user.getId());
         } catch (Exception e) {

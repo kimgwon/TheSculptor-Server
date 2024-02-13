@@ -1,7 +1,6 @@
 package backend.sculptor.domain.museum.service;
 
 import backend.sculptor.domain.museum.dto.MuseumProfileDTO;
-import backend.sculptor.domain.stone.dto.StoneListDTO;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.user.entity.Users;
@@ -36,24 +35,24 @@ public class MuseumProfoileService {
     }
 
     public List<MuseumProfileDTO.Stone> getProfileStones(UUID userId) {
-        List<StoneListDTO> stones = stoneService.getStonesByUserIdAfterFinalDate(userId);
+        List<Stone> stones = stoneService.getStonesByUserIdAfterFinalDate(userId);
 
         return convertToMuseumProfileStones(stones);
     }
 
     // Stone 엔터티를 MuseumStoneDTO로 변환하는 메서드
-    private List<MuseumProfileDTO.Stone> convertToMuseumProfileStones(List<StoneListDTO> stones) {
+    private List<MuseumProfileDTO.Stone> convertToMuseumProfileStones(List<Stone> stones) {
         return stones.stream()
                 .map(this::convertToMuseumProfileStone)
                 .toList();
     }
 
     // 단일 Stone 엔터티를 MuseumStoneDTO로 변환하는 메서드
-    private MuseumProfileDTO.Stone convertToMuseumProfileStone(StoneListDTO stone) {
+    private MuseumProfileDTO.Stone convertToMuseumProfileStone(Stone stone) {
         LocalDateTime startDate = stone.getStartDate();
 
         return MuseumProfileDTO.Stone.builder()
-                .id(stone.getStoneId())
+                .id(stone.getId())
                 .name(stone.getStoneName())
                 .dDay(stoneService.calculateDate(startDate.toLocalDate()))
                 .build();
