@@ -30,6 +30,7 @@ public class UserService {
         userRepository.delete(findUser);
     }
 
+    @Transactional
     public Users findUser(UUID userId) {
         return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
     }
