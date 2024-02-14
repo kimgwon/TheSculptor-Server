@@ -83,4 +83,20 @@ public class StoreController {
         }
     }
 
+    //[GET] 돈 조회
+    @GetMapping("/users/money")
+    public APIBody<MoneyDTO> getTotalPowder(@CurrentUser SessionUser user) {
+        if(user == null){
+            //사용자 인증 실패
+            return APIBody.of(401,"인증되지 않은 사용자입니다.", null);
+        }try{
+            int totalPowder = storeService.calculateTotalPowder(user.getId());
+            MoneyDTO response = new MoneyDTO(user.getId(),totalPowder);
+            return APIBody.of(200, "돈 조회 성공", response);
+        }catch (Exception e){
+            //기타 서버 오류
+            return APIBody.of(500, "서버 오류 발생", null);
+        }
+    }
+
 }
