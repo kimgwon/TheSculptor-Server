@@ -187,9 +187,12 @@ public class UserController {
 
     //액세스 토큰을 받았을때 사용자를 로그인 시키고, 세션에 담아 세션 아이디를 리턴
     @GetMapping("/user/login")
-    public APIBody<?> userLogin(HttpServletRequest request, RestTemplate restTemplate) {
-        String string = request.getHeader("Authorization");
-        String accessToken = string.substring(7);
+    public ResponseEntity<APIBody<?>> userLogin(HttpServletRequest request, RestTemplate restTemplate) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body(APIBody.of(400,"Authorization header is missing or invalid",null));
+        }
+        String accessToken = authorizationHeader.substring(7);
         System.out.println("accessToken = " + accessToken);
 
         // 카카오 사용자 정보 요청 헤더 설정
@@ -210,21 +213,21 @@ public class UserController {
             if (findMember.isEmpty()) {
                 users = Users.builder()
                         .name(profile.getProperties().getNickname()) // "properties" 내의 "nickname"
-                        .role("ROLE_USER") // 역할, 상황에 따라 설정
+                        .role("ROLE_USER")
                         .nickname("kakao_" + profile.getId())
-                        .profileImage(profile.getProperties().getProfileImage()) // "profile_image_url"
+                        .profileImage(profile.getProperties().getProfileImage())
                         .build();
                 userRepository.save(users);
             } else {
                 users = findMember.get();
             }
             httpSession.setAttribute("user", new SessionUser(users));
+            httpSession.setMaxInactiveInterval(1800);
             // 성공 응답 반환
-            return APIBody.of(200, "로그인 요청 성공", httpSession.getId());
+            return ResponseEntity.ok(APIBody.of(200, "로그인 요청 성공", Map.of("sessionId", httpSession.getId(), "userId", users.getId())));
         } catch (HttpClientErrorException e) {
-            // 에러 처리
             System.out.println("e.getMessage() = " + e.getMessage());
-            return APIBody.of(e.getStatusCode().value(), "사용자 정보 요청 실패", null);
+            return ResponseEntity.status(e.getStatusCode()).body(APIBody.of(e.getStatusCode().value(), "사용자 정보 요청 실패", null));
         } catch (JsonMappingException e) {
             throw new RuntimeException(e);
         } catch (JsonProcessingException e) {

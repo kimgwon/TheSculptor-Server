@@ -30,7 +30,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         OAuth2MemberInfo memberInfo = null;
 
         String accessToken = userRequest.getAccessToken().getTokenValue();
-        System.out.println("ㄹㅇaccessToken = " + accessToken);
+        //System.out.println("ㄹㅇaccessToken = " + accessToken);
 
         if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
             memberInfo = new GoogleMemberInfo(oAuth2User.getAttributes());
@@ -48,29 +48,7 @@ public class OAuth2MemberService extends DefaultOAuth2UserService {
         //String email = memberInfo.getEmail();
         String profile_image = memberInfo.getProfileImage();
         String role = "ROLE_USER"; //일반 유저
-
-        System.out.println("oAuth2User = " + oAuth2User.getAttributes());
-
-        Optional<Users> findMember = userRepository.findByName(username);
         Users users = null;
-        if (findMember.isEmpty()) {
-            System.out.println("사용자 디비에 없다는거임");
-        } else {
-            System.out.println("사용자가 딥비에 있다는 거잖?");
-        }
-//        if (findMember.isEmpty()) { //찾지 못했다면
-//            users = Users.builder()
-//                    .name(username)
-//                    .role(role)
-//                    .nickname(nickname)
-//                    .profileImage(profile_image)
-//                    .build();
-//            userRepository.save(users);
-//        } else {
-//            users = findMember.get();
-//        }
-
-        //httpSession.setAttribute("user", new SessionUser(users));
         return new PrincipalDetails(users, oAuth2User.getAttributes());
     }
 }
