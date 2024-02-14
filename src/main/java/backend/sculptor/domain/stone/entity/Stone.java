@@ -27,52 +27,45 @@ public class Stone {
     @JoinColumn(name = "user_id")
     private Users users;
 
+    @Enumerated(EnumType.STRING)
+    private Category category; //enum
+
     private String stoneName;
     private String stoneGoal;
     private String oneComment;
 
-    @Enumerated(EnumType.STRING)
-    private Category category; //enum
-
-    @Setter
     private int powder;
-    public void updatePowder(int addPowder) {
+    public void updatePowder(int addPowder) { // user 엔티티 totalPowder 업데이트
         this.powder += addPowder;
         if (users != null) {
-            users.updateTotalPowder(addPowder); // User 엔티티에 있는 totalPowder를 업데이트하는 메서드 호출
+            users.updateTotalPowder(addPowder);
         }
     }
 
-    private LocalDateTime startDate;
-    private LocalDateTime finalDate;
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-//    @OneToMany(mappedBy = "stones")
-//    private List<Status> statuses;
+    private LocalDateTime startDate;
+    private LocalDateTime finalDate;
 
-    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StoneLikes> likes = new ArrayList<>();
+    @Setter
+    private LocalDateTime lastManualChange;
 
     @Enumerated(EnumType.STRING)
     @Setter
     private StoneStatus status = StoneStatus.BASIC;
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StoneItem> stoneItems = new ArrayList<>();
+    private List<Achieve> achieves = new ArrayList<>();
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-//    @OneToOne
-//    @JoinColumn(name="achieve_id")
-//    private Achieve achieve;
+    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<StoneLikes> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Achieve> achieves = new ArrayList<>();
-
-    @Setter
-    private LocalDateTime lastManualChange;
+    private List<StoneItem> stoneItems = new ArrayList<>();
 
     /*
     //갱신일
