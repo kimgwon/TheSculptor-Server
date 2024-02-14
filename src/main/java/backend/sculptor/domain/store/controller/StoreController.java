@@ -1,5 +1,6 @@
 package backend.sculptor.domain.store.controller;
 
+import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.store.dto.*;
 import backend.sculptor.domain.store.service.StoreService;
@@ -8,9 +9,10 @@ import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,6 +57,29 @@ public class StoreController {
         return APIBody.of(HttpStatus.OK.value(), "아이템 구매 성공", purchaseItems);
     }
 
+
+    @GetMapping("/items")
+    public ResponseEntity<APIBody<?>> showItems() {
+        try {
+            List<Item> items = storeService.findItems();
+            List<Map<String, Object>> itemsList = new ArrayList<>();
+
+            for (Item item : items) {
+                Map<String, Object> itemData = new HashMap<>();
+                itemData.put("item_id", item.getId());
+                itemData.put("item_name", item.getItemName());
+                itemData.put("item_price", item.getItemPrice());
+                itemsList.add(itemData);
+            }
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("items", itemsList);
+
+            return ResponseEntity.ok(APIBody.of(200, "상점의 아이템 조회 성공", responseData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(APIBody.of(400, "조회 가능한 아이템이 없습니다.", null));
+        }
+    }
     //[GET] 돈 조회
     @GetMapping("/users/money")
     public APIBody<MoneyDTO> getTotalPowder(@CurrentUser SessionUser user) {
@@ -68,6 +93,7 @@ public class StoreController {
         }catch (Exception e){
             //기타 서버 오류
             return APIBody.of(500, "서버 오류 발생", null);
+
         }
     }
 

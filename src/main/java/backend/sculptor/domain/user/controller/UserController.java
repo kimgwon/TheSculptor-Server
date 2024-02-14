@@ -10,12 +10,19 @@ import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.domain.user.service.UserService;
 import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
+import backend.sculptor.global.oauth.memberInfo.KakaoMemberInfo;
+import backend.sculptor.global.oauth.memberInfo.KakaoProfile;
+import backend.sculptor.global.oauth.memberInfo.OAuth2MemberInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,6 +33,8 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final StoneService stoneService;
+    private final ObjectMapper objectMapper;
+    private final HttpSession httpSession;
 
     @GetMapping("/mypage")
     public ResponseEntity<APIBody<Map<String, Object>>> showMyPage(@CurrentUser SessionUser user) {
@@ -174,5 +183,56 @@ public class UserController {
         data.put("id", representStoneId);
 
         return APIBody.of(HttpStatus.OK.value(), "대표 돌 설정 성공", data);
+    }
+
+    //액세스 토큰을 받았을때 사용자를 로그인 시키고, 세션에 담아 세션 아이디를 리턴
+    @GetMapping("/user/login")
+    public ResponseEntity<APIBody<?>> userLogin(HttpServletRequest request, RestTemplate restTemplate) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body(APIBody.of(400,"Authorization header is missing or invalid",null));
+        }
+        String accessToken = authorizationHeader.substring(7);
+        System.out.println("accessToken = " + accessToken);
+
+        // 카카오 사용자 정보 요청 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        // HttpEntity 객체 생성
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
+
+        try {
+            // 카카오 사용자 정보 요청
+            ResponseEntity<String> response = restTemplate.exchange("https://kapi.kakao.com/v2/user/me", HttpMethod.GET, entity, String.class);
+            KakaoProfile profile = objectMapper.readValue(response.getBody(), KakaoProfile.class);
+
+            Optional<Users> findMember = userRepository.findByName(profile.getProperties().getNickname());
+            Users users;
+            if (findMember.isEmpty()) {
+                users = Users.builder()
+                        .name(profile.getProperties().getNickname()) // "properties" 내의 "nickname"
+                        .role("ROLE_USER")
+                        .nickname("kakao_" + profile.getId())
+                        .profileImage(profile.getProperties().getProfileImage())
+                        .build();
+                userRepository.save(users);
+            } else {
+                users = findMember.get();
+            }
+            httpSession.setAttribute("user", new SessionUser(users));
+            httpSession.setMaxInactiveInterval(1800);
+            // 성공 응답 반환
+            return ResponseEntity.ok(APIBody.of(200, "로그인 요청 성공", Map.of("sessionId", httpSession.getId(), "userId", users.getId())));
+        } catch (HttpClientErrorException e) {
+            System.out.println("e.getMessage() = " + e.getMessage());
+            return ResponseEntity.status(e.getStatusCode()).body(APIBody.of(e.getStatusCode().value(), "사용자 정보 요청 실패", null));
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

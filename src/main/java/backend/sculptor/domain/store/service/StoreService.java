@@ -90,6 +90,10 @@ public class StoreService {
                 .build();
     }
 
+    public List<Item> findItems() {
+        return itemService.findItems();
+    }
+
     // Stone 엔터티를 StoreStones.Stone 변환하는 메서드
     private List<StoreStones.Stone> convertToStoreStones(List<Stone> stones) {
         return stones.stream()

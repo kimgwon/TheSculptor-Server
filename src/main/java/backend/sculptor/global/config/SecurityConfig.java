@@ -31,18 +31,18 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
                 .logout((logoutConfig) ->
                         logoutConfig.logoutSuccessHandler(customLogoutSuccessHandler))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/token/**").permitAll() //토큰 발급을 위한 경로는 모두 허용
-                        .requestMatchers("/user-logout","/","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
-                        .requestMatchers("/mypage/**",
-                                "/**").authenticated() // 로그인 접근 가능
-                                //.anyRequest().permitAll()
-                        )
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/token/**").permitAll() //토큰 발급을 위한 경로는 모두 허용
+//                        .requestMatchers("/user-logout","/","/css/**","/images/**","/user/login","/favicon.ico").permitAll()
+//                        .requestMatchers("/mypage/**",
+//                                "/**").authenticated() // 로그인 접근 가능
+//                                //.anyRequest().permitAll()
+//                        )
                 .headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(oAuth2MemberService))
-                                .successHandler(customAuthenticationSuccessHandler)
+                                //.successHandler(customAuthenticationSuccessHandler)
                                 .loginPage("/") //로그인이 필요한데 로그인을 하지 않았다면 이동할 uri 설정
                 );
 

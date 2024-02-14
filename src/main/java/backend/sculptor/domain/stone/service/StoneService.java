@@ -292,8 +292,7 @@ public class StoneService {
 
 
     public List<StoneItem> findAllStoneItem(StoneListDTO stone) {
-        Stone findStone = stoneRepository.findById(stone.getStoneId()).orElseThrow(NoSuchElementException::new);
-        List<StoneItem> result = stoneItemRepository.findAllByStone(findStone);
+        List<StoneItem> result = stoneItemRepository.findAllByStone(stone);
         return result;
     }
 
@@ -306,6 +305,10 @@ public class StoneService {
                 .dDay(calculateDate(stone.getStartDate().toLocalDate()))
                 .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
                 .build();
+    }
+
+    public List<StoneItem> findStoneItems(UUID stoneId) {
+        return stoneItemRepository.findAllByStoneId(stoneId);
     }
 }
 
