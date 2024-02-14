@@ -57,4 +57,8 @@ public class ItemService {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ITEM_NOT_FOUND.getMessage()));
     }
+
+    public List<Item> findItems() {
+        return itemRepository.findAll();
+    }
 }
