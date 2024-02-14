@@ -160,7 +160,7 @@ public class AchieveService {
         LocalDate endDate = stone.getFinalDate().toLocalDate();
         LocalDate today = LocalDate.now();
 
-        if (endDate.isBefore(today))
+        if (endDate.isAfter(today))
             endDate = today;
 
         long totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1; // 오늘 포함 계산
