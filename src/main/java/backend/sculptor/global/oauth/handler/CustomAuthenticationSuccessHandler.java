@@ -38,5 +38,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 //            System.out.println("e.getMessage() = " + e.getMessage());
 //        }
 //        response.sendRedirect("/?sessionId=" +request.getSession().getId());
+
     }
 }

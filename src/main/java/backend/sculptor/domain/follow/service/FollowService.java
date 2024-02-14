@@ -54,11 +54,8 @@ public class FollowService {
             if (findUser != null) {
                 String nickname = findUser.getNickname();
                 String profileImage = findUser.getProfileImage();
-                UUID representStoneId;
-                if (findUser.getRepresentStone() == null)
-                    representStoneId = null;
-                else
-                    representStoneId = findUser.getRepresentStone().getId();
+                UUID representStoneId = userService.getRepresentStoneId(findUser);
+
                 FollowSimpleListDto dto = new FollowSimpleListDto(followingUserId, nickname, profileImage, representStoneId);
                 dtoList.add(dto);
             }

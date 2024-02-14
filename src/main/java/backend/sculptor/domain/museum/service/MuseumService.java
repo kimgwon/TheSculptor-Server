@@ -64,7 +64,7 @@ public class MuseumService {
                 .build();
     }
 
-    public boolean isOwner(UUID ownerId, UUID userId) { return ownerId == userId; }
+    public boolean isOwner(UUID ownerId, UUID userId) { return ownerId.equals(userId); }
     public int getStoneCount(List<Stone> stones) {
         return stones != null ? stones.size() : 0;
     }
