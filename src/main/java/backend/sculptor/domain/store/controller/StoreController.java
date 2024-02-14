@@ -1,5 +1,6 @@
 package backend.sculptor.domain.store.controller;
 
+import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.store.dto.Basket;
 import backend.sculptor.domain.store.dto.Purchase;
@@ -11,9 +12,10 @@ import backend.sculptor.global.api.APIBody;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,6 +58,29 @@ public class StoreController {
     ) {
         Purchase.Response purchaseItems = storeService.purchaseItems(user.getId(), stoneId, items.getItemIds());
         return APIBody.of(HttpStatus.OK.value(), "아이템 구매 성공", purchaseItems);
+    }
+
+    @GetMapping("/items")
+    public ResponseEntity<APIBody<?>> showItems() {
+        try {
+            List<Item> items = storeService.findItems();
+            List<Map<String, Object>> itemsList = new ArrayList<>();
+
+            for (Item item : items) {
+                Map<String, Object> itemData = new HashMap<>();
+                itemData.put("item_id", item.getId());
+                itemData.put("item_name", item.getItemName());
+                itemData.put("item_price", item.getItemPrice());
+                itemsList.add(itemData);
+            }
+
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("items", itemsList);
+
+            return ResponseEntity.ok(APIBody.of(200, "상점의 아이템 조회 성공", responseData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(APIBody.of(400, "조회 가능한 아이템이 없습니다.", null));
+        }
     }
 
 }
