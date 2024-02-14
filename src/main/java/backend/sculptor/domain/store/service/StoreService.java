@@ -4,9 +4,11 @@ import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.entity.Stone;
 import backend.sculptor.domain.stone.entity.StoneItem;
 import backend.sculptor.domain.stone.repository.StoneItemRepository;
+import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.stone.service.StoneService;
 import backend.sculptor.domain.store.dto.Basket;
+import backend.sculptor.domain.store.dto.MoneyDTO;
 import backend.sculptor.domain.store.dto.Purchase;
 import backend.sculptor.domain.store.dto.StoreStones;
 import backend.sculptor.domain.user.entity.Users;
@@ -29,6 +31,7 @@ public class StoreService {
     private final StoneItemRepository stoneItemRepository;
     private final StoneService stoneService;
     private final ItemService itemService;
+    private final StoneRepository stoneRepository;
 
     public StoreStones getStones(UUID userID) {
         Users user = userRepository.findById(userID)
@@ -113,4 +116,14 @@ public class StoreService {
                 .collect(Collectors.toList());
 
     }
+
+    //돈 조회
+    public int calculateTotalPowder(UUID userId){
+        List<Stone> stones = stoneRepository.findByUsersId(userId);
+        if (stones.isEmpty()) {
+            throw new RuntimeException("사용자가 생성한 돌이 없습니다.");
+        }
+        return stones.stream().mapToInt(Stone::getPowder).sum();
+    }
+
 }
