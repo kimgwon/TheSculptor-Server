@@ -1,6 +1,7 @@
 package backend.sculptor.domain.store.controller;
 
 import backend.sculptor.domain.stone.entity.Item;
+import backend.sculptor.domain.stone.entity.StoneItem;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.store.dto.*;
 import backend.sculptor.domain.store.service.StoreService;
@@ -80,21 +81,58 @@ public class StoreController {
             return ResponseEntity.badRequest().body(APIBody.of(400, "조회 가능한 아이템이 없습니다.", null));
         }
     }
+
     //[GET] 돈 조회
     @GetMapping("/users/money")
     public APIBody<MoneyDTO> getTotalPowder(@CurrentUser SessionUser user) {
-        if(user == null){
+        if (user == null) {
             //사용자 인증 실패
-            return APIBody.of(401,"인증되지 않은 사용자입니다.", null);
-        }try{
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
             int totalPowder = storeService.calculateTotalPowder(user.getId());
-            MoneyDTO response = new MoneyDTO(user.getId(),totalPowder);
+            MoneyDTO response = new MoneyDTO(user.getId(), totalPowder);
             return APIBody.of(200, "돈 조회 성공", response);
-        }catch (Exception e){
+        } catch (Exception e) {
             //기타 서버 오류
             return APIBody.of(500, "서버 오류 발생", null);
 
         }
     }
 
+    //user가 가진 stone의 id -> stone_item 에서 검색 -> item_id로 item 테이블에 id,name,price
+    @GetMapping("/users/items")
+    public APIBody<?> getUsersItems(@CurrentUser SessionUser user) {
+        if (user == null) {
+            return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
+        }
+        try {
+            List<StoreItemDTO> userItems = storeService.findUserItems(user.getId());
+            Map<String, List<StoreItemDTO>> data = new HashMap<>();
+            data.put("userItems", userItems);
+            return APIBody.of(200, "사용자가 구매한 아이템 조회 성공", data);
+        } catch (Exception e) {
+            System.out.println("e.getMessage() = " + e.getMessage());
+            return APIBody.of(500, "서버 내부 오류", null);
+        }
+    }
+
+    @GetMapping("/store/stones/{stoneId}")
+    public ResponseEntity<APIBody<Object>> showStoneItems(@CurrentUser SessionUser user,
+                                                          @PathVariable("stoneId") UUID stoneId) {
+        APIBody<Object> response = null;
+        if (user == null) {
+            response = APIBody.of(400, "사용자 정보가 존재하지 않습니다.", null);
+            return ResponseEntity.badRequest().body(response);
+        }
+        try {
+            List<StoreItemDTO> stoneItems = storeService.findStoneItems(stoneId);
+            Map<String, List<StoreItemDTO>> data = new HashMap<>();
+            data.put("stoneItems", stoneItems);
+
+            return ResponseEntity.ok(APIBody.of(200, "조각상이 착용중인 아이템 조회 성공", data));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(APIBody.of(500, "서버 에러: " + e.getMessage(), null));
+        }
+    }
 }

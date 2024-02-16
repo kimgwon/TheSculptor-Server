@@ -22,7 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -305,10 +304,6 @@ public class StoneService {
                 .dDay(calculateDate(stone.getStartDate().toLocalDate()))
                 .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
                 .build();
-    }
-
-    public List<StoneItem> findStoneItems(UUID stoneId) {
-        return stoneItemRepository.findAllByStoneId(stoneId);
     }
 }
 
