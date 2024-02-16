@@ -7,10 +7,7 @@ import backend.sculptor.domain.stone.repository.StoneItemRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.stone.service.StoneService;
-import backend.sculptor.domain.store.dto.Basket;
-import backend.sculptor.domain.store.dto.MoneyDTO;
-import backend.sculptor.domain.store.dto.Purchase;
-import backend.sculptor.domain.store.dto.StoreStones;
+import backend.sculptor.domain.store.dto.*;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.global.exception.BadRequestException;
@@ -20,8 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,4 +126,35 @@ public class StoreService {
         return stones.stream().mapToInt(Stone::getPowder).sum();
     }
 
+    @Transactional
+    public List<StoreItemDTO> findUserItems(UUID userId) {
+        Users loggedInUser = userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        List<Stone> stones = loggedInUser.getStones();
+
+        Set<UUID> uniqueItemIds = new HashSet<>();
+        
+        List<StoreItemDTO> uniqueItems = stones.stream()
+                .flatMap(stone -> stoneItemRepository.findAllByStoneId(stone.getId()).stream())
+                .filter(stoneItem -> uniqueItemIds.add(stoneItem.getItem().getId())) // 중복 제거
+                .map(stoneItem -> convertToStoreItemDTO(stoneItem)) // StoneItem을 StoreItemDTO로 변환
+                .collect(Collectors.toList());
+
+        return uniqueItems;
+    }
+
+    private StoreItemDTO convertToStoreItemDTO(StoneItem stoneItem) {
+        return new StoreItemDTO(
+                stoneItem.getItem().getId(),
+                stoneItem.getItem().getItemName(),
+                stoneItem.getItem().getItemPrice()
+        );
+    }
+
+    @Transactional
+    public List<StoreItemDTO> findStoneItems(UUID stoneId) {
+        List<StoneItem> stoneItems = stoneItemRepository.findAllByStoneId(stoneId);
+        return stoneItems.stream()
+                .map(this::convertToStoreItemDTO) // StoneItem을 StoreItemDTO로 변환
+                .collect(Collectors.toList());
+    }
 }

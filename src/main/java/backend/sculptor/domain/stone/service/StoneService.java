@@ -305,10 +305,6 @@ public class StoneService {
                 .achievementRate(achieveService.calculateAchievementRate(stone.getId()))
                 .build();
     }
-
-    public List<StoneItem> findStoneItems(UUID stoneId) {
-        return stoneItemRepository.findAllByStoneId(stoneId);
-    }
 }
 
 
