@@ -2,10 +2,7 @@ package backend.sculptor.domain.store.controller;
 
 import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.service.ItemService;
-import backend.sculptor.domain.store.dto.Basket;
-import backend.sculptor.domain.store.dto.Purchase;
-import backend.sculptor.domain.store.dto.StoreStones;
-import backend.sculptor.domain.store.dto.WearItem;
+import backend.sculptor.domain.store.dto.*;
 import backend.sculptor.domain.store.service.StoreService;
 import backend.sculptor.domain.user.entity.SessionUser;
 import backend.sculptor.global.api.APIBody;
@@ -60,6 +57,7 @@ public class StoreController {
         return APIBody.of(HttpStatus.OK.value(), "아이템 구매 성공", purchaseItems);
     }
 
+
     @GetMapping("/items")
     public ResponseEntity<APIBody<?>> showItems() {
         try {
@@ -82,7 +80,6 @@ public class StoreController {
             return ResponseEntity.badRequest().body(APIBody.of(400, "조회 가능한 아이템이 없습니다.", null));
         }
     }
-
     //[GET] 돈 조회
     @GetMapping("/users/money")
     public APIBody<MoneyDTO> getTotalPowder(@CurrentUser SessionUser user) {
@@ -96,6 +93,7 @@ public class StoreController {
         }catch (Exception e){
             //기타 서버 오류
             return APIBody.of(500, "서버 오류 발생", null);
+
         }
     }
 
