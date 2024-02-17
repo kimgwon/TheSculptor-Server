@@ -222,7 +222,8 @@ public class UserController {
                 users = findMember.get();
             }
             httpSession.setAttribute("user", new SessionUser(users));
-            httpSession.setMaxInactiveInterval(1800);
+            //httpSession.setMaxInactiveInterval(1800);
+            httpSession.setMaxInactiveInterval(-1);
             // 성공 응답 반환
             return ResponseEntity.ok(APIBody.of(200, "로그인 요청 성공", Map.of("sessionId", httpSession.getId(), "userId", users.getId())));
         } catch (HttpClientErrorException e) {
