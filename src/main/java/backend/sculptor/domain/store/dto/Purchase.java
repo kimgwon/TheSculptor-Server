@@ -16,12 +16,6 @@ public final class Purchase {
     @Builder
     public static final class Response{
         private UUID stoneId;
-        private List<StoneItem> items;
-
-        @Getter
-        @Builder
-        public static final class StoneItem {
-            private UUID id;
-        }
+        private List<StoreItemDTO> items;
     }
 }

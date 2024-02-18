@@ -1,12 +1,15 @@
 package backend.sculptor.domain.store.controller;
 
 import backend.sculptor.domain.stone.entity.Item;
-import backend.sculptor.domain.stone.entity.StoneItem;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.store.dto.*;
 import backend.sculptor.domain.store.service.StoreService;
 import backend.sculptor.domain.user.entity.SessionUser;
+import backend.sculptor.domain.user.entity.Users;
+import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.global.api.APIBody;
+import backend.sculptor.global.exception.ErrorCode;
+import backend.sculptor.global.exception.NotFoundException;
 import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @RequestMapping("/store")
 public class StoreController {
+    private final UserRepository userRepository;
     private final ItemService itemService;
     private final StoreService storeService;
 
@@ -28,13 +32,14 @@ public class StoreController {
         return APIBody.of(HttpStatus.OK.value(), "조각상 조회 성공", storeStones);
     }
 
-    @PatchMapping("/stones/{stoneId}/items")
-    public APIBody<WearItem.Response> updateWearItem(
+    @PatchMapping("/stones/{stoneId}/type")
+    public APIBody<WearType.Response> updateWearType(
+            @CurrentUser SessionUser user,
             @PathVariable UUID stoneId,
-            @RequestBody WearItem.Request items
+            @RequestParam(required = false) UUID id
     ) {
-        WearItem.Response wearItems = itemService.updateWearItem(stoneId, items.getItemIds());
-        return APIBody.of(HttpStatus.OK.value(), "돌 아이템 착용 변경 성공", wearItems);
+        WearType.Response wearType = itemService.updateWearType(user.getId(), stoneId, id);
+        return APIBody.of(HttpStatus.OK.value(), "돌 원석 착용 변경 성공", wearType);
     }
 
 
@@ -84,14 +89,16 @@ public class StoreController {
 
     //[GET] 돈 조회
     @GetMapping("/users/money")
-    public APIBody<MoneyDTO> getTotalPowder(@CurrentUser SessionUser user) {
-        if (user == null) {
+    public APIBody<MoneyDTO> getTotalPowder(@CurrentUser SessionUser currentUser) {
+        if (currentUser == null) {
             //사용자 인증 실패
             return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
         }
         try {
-            int totalPowder = storeService.calculateTotalPowder(user.getId());
-            MoneyDTO response = new MoneyDTO(user.getId(), totalPowder);
+            Users user = userRepository.findById(currentUser.getId())
+                    .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
+            MoneyDTO response = new MoneyDTO(user.getId(), user.getTotalPowder());
             return APIBody.of(200, "돈 조회 성공", response);
         } catch (Exception e) {
             //기타 서버 오류
@@ -117,7 +124,7 @@ public class StoreController {
         }
     }
 
-    @GetMapping("/store/stones/{stoneId}")
+    @GetMapping("/stones/{stoneId}")
     public ResponseEntity<APIBody<Object>> showStoneItems(@CurrentUser SessionUser user,
                                                           @PathVariable("stoneId") UUID stoneId) {
         APIBody<Object> response = null;

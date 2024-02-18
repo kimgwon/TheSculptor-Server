@@ -48,9 +48,6 @@ public class Stone {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-//    @OneToMany(mappedBy = "stones")
-//    private List<Status> statuses;
-
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<StoneLikes> likes = new ArrayList<>();
 
@@ -59,17 +56,22 @@ public class Stone {
     private StoneStatus status = StoneStatus.BASIC;
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StoneItem> stoneItems = new ArrayList<>();
+    private List<StoneItem> stoneTypes = new ArrayList<>();
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-//    @OneToOne
-//    @JoinColumn(name="achieve_id")
-//    private Achieve achieve;
-
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Achieve> achieves = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "worn_type_id")
+    private Item type;
+
+    // 원석 착용 메서드
+    public void wearType(Item type) {
+        this.type = type;
+    }
 
     @Setter
     private LocalDateTime lastManualChange;

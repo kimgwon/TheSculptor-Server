@@ -17,6 +17,7 @@ public final class Basket {
     public static final class Response {
         private UUID stoneId;
         private List<Item> items;
+        private int totalPrice;
 
         @Getter
         @Builder

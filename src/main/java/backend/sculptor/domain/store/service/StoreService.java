@@ -7,7 +7,10 @@ import backend.sculptor.domain.stone.repository.StoneItemRepository;
 import backend.sculptor.domain.stone.repository.StoneRepository;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.stone.service.StoneService;
-import backend.sculptor.domain.store.dto.*;
+import backend.sculptor.domain.store.dto.Basket;
+import backend.sculptor.domain.store.dto.Purchase;
+import backend.sculptor.domain.store.dto.StoreItemDTO;
+import backend.sculptor.domain.store.dto.StoreStones;
 import backend.sculptor.domain.user.entity.Users;
 import backend.sculptor.domain.user.repository.UserRepository;
 import backend.sculptor.global.exception.BadRequestException;
@@ -48,17 +51,17 @@ public class StoreService {
         return Basket.Response.builder()
                 .stoneId(stone.getId())
                 .items(convertToBasketResponse(stoneId, items))
+                .totalPrice(calculateTotalPrice(stoneId, itemsID))
                 .build();
     }
 
     @Transactional
     public Purchase.Response purchaseItems(UUID userId, UUID stoneId, List<UUID> itemIds){
-        // TODO : 사용자의 powder가 구매할 아이템의 파우더보다 적으면 예외처리
-
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+
         Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
-        List<Purchase.Response.StoneItem> items = itemIds.stream()
+        List<StoreItemDTO> items = itemIds.stream()
                 .map(itemId -> {
                     boolean isPurchasedItem = itemService.isPurchasedItem(stoneId, itemId);
                     if (isPurchasedItem) {
@@ -71,10 +74,16 @@ public class StoreService {
                                 .build();
                         stoneItemRepository.save(stoneItem);
 
+                        // 사용자의 totalPowder가 구매할 아이템의 파우더보다 적으면 예외처리
+                        if (user.getTotalPowder()<item.getItemPrice())
+                            throw new BadRequestException(ErrorCode.USER_POWDER_NOT_ENOUGH.getMessage());
+
                         user.updateTotalPowder(-item.getItemPrice());
 
-                        return Purchase.Response.StoneItem.builder()
-                                .id(stoneItem.getItem().getId())
+                        return StoreItemDTO.builder()
+                                .itemId(stoneItem.getItem().getId())
+                                .itemName(stoneItem.getItem().getItemName())
+                                .itemPrice(stoneItem.getItem().getItemPrice())
                                 .build();
                     }
                 })
@@ -124,6 +133,18 @@ public class StoreService {
             throw new RuntimeException("사용자가 생성한 돌이 없습니다.");
         }
         return stones.stream().mapToInt(Stone::getPowder).sum();
+    }
+
+    // 구매하려는 상품의 총 금액 계산
+    public int calculateTotalPrice(UUID stoneId, List<UUID> itemIds) {
+        return itemIds.stream()
+                .mapToInt(itemId -> {
+                    Item item = itemService.getItemById(itemId);
+                    if (Boolean.TRUE.equals(itemService.isPurchasedItem(stoneId, item.getId())))
+                        return 0;
+                    return item.getItemPrice();
+                })
+                .sum();
     }
 
     @Transactional
