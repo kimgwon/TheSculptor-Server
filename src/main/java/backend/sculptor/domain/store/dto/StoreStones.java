@@ -1,5 +1,6 @@
 package backend.sculptor.domain.store.dto;
 
+import backend.sculptor.domain.stone.entity.Category;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ public final class StoreStones {
     public static final class Stone {
         private UUID id;
         private String name;
+        private Category category;
         private Integer powder;
     }
 }
