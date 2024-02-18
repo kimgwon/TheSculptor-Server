@@ -56,7 +56,7 @@ public class Stone {
     private StoneStatus status = StoneStatus.BASIC;
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StoneItem> stoneItems = new ArrayList<>();
+    private List<StoneItem> stoneTypes = new ArrayList<>();
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();

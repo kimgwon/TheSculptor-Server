@@ -51,6 +51,7 @@ public class StoreService {
         return Basket.Response.builder()
                 .stoneId(stone.getId())
                 .items(convertToBasketResponse(stoneId, items))
+                .totalPrice(calculateTotalPrice(stoneId, itemsID))
                 .build();
     }
 
@@ -59,13 +60,8 @@ public class StoreService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
 
-        // 사용자의 totalPowder가 구매할 아이템의 파우더보다 적으면 예외처리
-        if (user.getTotalPowder() < calculateTotalPrice(itemIds)){
-            throw new BadRequestException(ErrorCode.USER_POWDER_NOT_ENOUGH.getMessage());
-        }
-
         Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
-        List<Purchase.Response.StoneItem> items = itemIds.stream()
+        List<StoreItemDTO> items = itemIds.stream()
                 .map(itemId -> {
                     boolean isPurchasedItem = itemService.isPurchasedItem(stoneId, itemId);
                     if (isPurchasedItem) {
@@ -78,10 +74,16 @@ public class StoreService {
                                 .build();
                         stoneItemRepository.save(stoneItem);
 
+                        // 사용자의 totalPowder가 구매할 아이템의 파우더보다 적으면 예외처리
+                        if (user.getTotalPowder()<item.getItemPrice())
+                            throw new BadRequestException(ErrorCode.USER_POWDER_NOT_ENOUGH.getMessage());
+
                         user.updateTotalPowder(-item.getItemPrice());
 
-                        return Purchase.Response.StoneItem.builder()
-                                .id(stoneItem.getItem().getId())
+                        return StoreItemDTO.builder()
+                                .itemId(stoneItem.getItem().getId())
+                                .itemName(stoneItem.getItem().getItemName())
+                                .itemPrice(stoneItem.getItem().getItemPrice())
                                 .build();
                     }
                 })
@@ -134,10 +136,12 @@ public class StoreService {
     }
 
     // 구매하려는 상품의 총 금액 계산
-    public int calculateTotalPrice(List<UUID> itemIds) {
-        return (int) itemIds.stream()
-                .mapToDouble(itemId -> {
+    public int calculateTotalPrice(UUID stoneId, List<UUID> itemIds) {
+        return itemIds.stream()
+                .mapToInt(itemId -> {
                     Item item = itemService.getItemById(itemId);
+                    if (Boolean.TRUE.equals(itemService.isPurchasedItem(stoneId, item.getId())))
+                        return 0;
                     return item.getItemPrice();
                 })
                 .sum();

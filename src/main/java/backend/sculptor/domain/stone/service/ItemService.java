@@ -56,19 +56,24 @@ public class ItemService {
             Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
             stone.wearType(null);
             stoneRepository.save(stone);
+
+            return WearType.Response.builder()
+                    .stoneId(stoneId)
+                    .typeId(null)
+                    .build();
         }
 
         StoneItem stoneType = stoneItemRepository.findByStoneIdAndItemId(stoneId, typeId)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.STONE_NOT_PURCHASE_ITEM.getMessage()));
 
-        Item type = stoneType.getStone().getType();
+        Item type = stoneType.getItem();
         Stone stone = stoneType.getStone();
         stone.wearType(type);
         stoneRepository.save(stone);
 
         return WearType.Response.builder()
                 .stoneId(stoneId)
-                .typeId(type.getId())
+                .typeId(typeId)
                 .build();
     }
 
