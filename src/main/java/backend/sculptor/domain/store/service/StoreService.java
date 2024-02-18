@@ -111,6 +111,7 @@ public class StoreService {
         return StoreStones.Stone.builder()
                 .id(stone.getId())
                 .name(stone.getStoneName())
+                .category(stone.getCategory())
                 .powder(stone.getPowder())
                 .build();
     }
