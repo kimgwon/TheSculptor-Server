@@ -39,7 +39,7 @@ public class ItemService extends ProductService<Item, StoneItem> {
         List<StoneItem> stoneItems = stoneItemRepository.findAllByStoneId(stoneId);
         List<WearItem.Response.StoneItem> items = stoneItems.stream()
                 .map(stoneItem -> {
-                    UUID itemId = stoneItem.getItem().getId();
+                    UUID itemId = stoneItem.getId();
                     boolean toggleWear = itemIds.contains(itemId);
                     stoneItem.setIsWorn(toggleWear);
                     stoneItemRepository.save(stoneItem);
