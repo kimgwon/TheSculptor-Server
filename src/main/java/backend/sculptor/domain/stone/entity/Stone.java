@@ -65,7 +65,19 @@ public class Stone {
     private List<StoneLikes> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<StoneItem> stoneItems = new ArrayList<>();
+    private List<StoneType> stoneTypes = new ArrayList<>();
+
+//    @OneToMany(mappedBy = "stone", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<StoneItem> stoneItems = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "worn_type_id")
+    private Type type;
+
+    // Stone 착용 메서드
+    public void wearType(Type type) {
+        this.type = type;
+    }
 
     /*
     //갱신일

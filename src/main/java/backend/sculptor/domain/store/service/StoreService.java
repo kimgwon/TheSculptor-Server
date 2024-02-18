@@ -1,11 +1,9 @@
 package backend.sculptor.domain.store.service;
 
-import backend.sculptor.domain.stone.entity.Item;
-import backend.sculptor.domain.stone.entity.Stone;
-import backend.sculptor.domain.stone.entity.StoneItem;
-import backend.sculptor.domain.stone.repository.StoneItemRepository;
+import backend.sculptor.domain.stone.entity.*;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.stone.service.StoneService;
+import backend.sculptor.domain.stone.service.TypeService;
 import backend.sculptor.domain.store.dto.Basket;
 import backend.sculptor.domain.store.dto.Purchase;
 import backend.sculptor.domain.store.dto.StoreStones;
@@ -18,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,9 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StoreService {
     private final UserRepository userRepository;
-    private final StoneItemRepository stoneItemRepository;
     private final StoneService stoneService;
     private final ItemService itemService;
+    private final TypeService typeService;
 
     public StoreStones getStones(UUID userID) {
         Users user = userRepository.findById(userID)
@@ -42,53 +41,85 @@ public class StoreService {
     }
 
     @Transactional
-    public Basket.Response getBasketItems(UUID userId, UUID stoneId, List<UUID> itemsID){
-        List<Item> items = itemService.getItemsById(itemsID);
+    public Basket.Response getBasketProducts(UUID userId, UUID stoneId, List<UUID> productsID){
+        List<Product> products = new ArrayList<>();
+
+        for (UUID productId : productsID) {
+            Product product = findProduct(productId);
+            products.add(product);
+        }
+
         Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
 
         return Basket.Response.builder()
                 .stoneId(stone.getId())
-                .items(convertToBasketResponse(stoneId, items))
+                .items(convertToBasketItemResponse(stoneId, products))
+                .types(convertToBasketTypeResponse(stoneId, products))
                 .build();
     }
 
     @Transactional
-    public Purchase.Response purchaseItems(UUID userId, UUID stoneId, List<UUID> itemIds){
-        // TODO : 사용자의 powder가 구매할 아이템의 파우더보다 적으면 예외처리
-
+    public Purchase.Response purchaseProducts(UUID userId, UUID stoneId, List<UUID> productIds) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
         Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
-        List<Purchase.Response.StoneItem> items = itemIds.stream()
-                .map(itemId -> {
-                    boolean isPurchasedItem = itemService.isPurchasedItem(stoneId, itemId);
-                    if (isPurchasedItem) {
-                        throw new BadRequestException(ErrorCode.STONE_ALREADY_PURCHASE.getMessage() + " Item Id:" + itemId);
-                    } else {
-                        Item item = itemService.getItemById(itemId);
-                        StoneItem stoneItem = StoneItem.builder()
-                                .stone(stone)
-                                .item(item)
-                                .build();
-                        stoneItemRepository.save(stoneItem);
 
-                        user.updateTotalPowder(-item.getItemPrice());
+        for (UUID productId : productIds) {
+            Product product = findProduct(productId);
+            if (product == null) {
+                throw new BadRequestException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+            }
 
-                        return Purchase.Response.StoneItem.builder()
-                                .id(stoneItem.getItem().getId())
-                                .build();
-                    }
-                })
-                .toList();
+            boolean isPurchasedItem = itemService.isPurchased(stoneId, productId);
+            boolean isPurchasedType = typeService.isPurchased(stoneId, productId);
+            if (isPurchasedItem || isPurchasedType) {
+                throw new BadRequestException(ErrorCode.STONE_ALREADY_PURCHASE.getMessage() + " Product Id:" + productId);
+            }
+
+            user.updateTotalPowder(-product.getPrice());
+
+            StoneProduct stoneProduct = StoneProduct.builder()
+                    .stone(stone)
+                    .product(product)
+                    .build();
+
+            if (product instanceof Item) {
+                itemService.purchase(StoneItem.builder()
+                                .id(stoneProduct.getId())
+                                .product(stoneProduct.getProduct())
+                                .stone(stoneProduct.getStone())
+                                .isWorn(false)
+                                .build());
+            } else if (product instanceof Type) {
+                typeService.purchase(StoneType.builder()
+                                .id(stoneProduct.getId())
+                                .product(stoneProduct.getProduct())
+                                .stone(stoneProduct.getStone())
+                                .build());
+            }
+        }
 
         return Purchase.Response.builder()
                 .stoneId(stone.getId())
-                .items(items)
+                .products(productIds)
                 .build();
+    }
+
+    public Product findProduct(UUID productId){
+        if (itemService.isProduct(productId))
+            return itemService.getProductById(productId);
+        else if (typeService.isProduct(productId))
+            return typeService.getProductById(productId);
+        else
+            throw new BadRequestException(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
     }
 
     // Stone 엔터티를 StoreStones.Stone 변환하는 메서드
     private List<StoreStones.Stone> convertToStoreStones(List<Stone> stones) {
+        if (stones.isEmpty()) {
+            return null;
+        }
+
         return stones.stream()
                 .map(this::convertToStoreStone)
                 .toList();
@@ -103,14 +134,33 @@ public class StoreService {
                 .build();
     }
 
-    private List<Basket.Response.Item> convertToBasketResponse(UUID stoneId, List<Item> items) {
-        return items.stream()
+    private List<Basket.Response.Item> convertToBasketItemResponse(UUID stoneId, List<Product> products) {
+        if (products.isEmpty()) {
+            return null;
+        }
+
+        return products.stream()
+                .filter(product -> product instanceof Item)
                 .map(item -> Basket.Response.Item.builder()
                         .id(item.getId())
-                        .price(item.getItemPrice())
-                        .isPurchased(itemService.isPurchasedItem(stoneId, item.getId()))
+                        .price(item.getPrice())
+                        .isPurchased(itemService.isPurchased(stoneId, item.getId()))
                         .build())
                 .collect(Collectors.toList());
+    }
 
+    private List<Basket.Response.Type> convertToBasketTypeResponse(UUID stoneId, List<Product> products) {
+        if (products.isEmpty()) {
+            return null;
+        }
+
+        return products.stream()
+                .filter(product -> product instanceof Type)
+                .map(type -> Basket.Response.Type.builder()
+                        .id(type.getId())
+                        .price(type.getPrice())
+                        .isPurchased(typeService.isPurchased(stoneId, type.getId()))
+                        .build())
+                .collect(Collectors.toList());
     }
 }

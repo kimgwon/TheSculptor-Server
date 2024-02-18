@@ -51,9 +51,11 @@ public class StoneService {
     public List<Stone> getStonesByUserIdAfterFinalDate(UUID userId) {
         List<Stone> stones = stoneRepository.findByUsersId(userId);
         LocalDateTime currentDate = LocalDateTime.now();
+
         return stones.stream()
                 .filter(stone -> stone.getFinalDate().isBefore(currentDate)) // 목표일 이후인 돌만 필터링
-                .toList();
+                .toList()
+                .isEmpty() ? null : stones;
     }
 
     //돌 생성

@@ -44,7 +44,7 @@ public class StoreController {
             @PathVariable UUID stoneId,
             @RequestBody Basket.Request basket
     ) {
-        Basket.Response storeStones = storeService.getBasketItems(user.getId(), stoneId, basket.getItemIds());
+        Basket.Response storeStones = storeService.getBasketProducts(user.getId(), stoneId, basket.getItemIds());
         return APIBody.of(HttpStatus.OK.value(), "장바구니 정보 조회 성공", storeStones);
     }
 
@@ -54,7 +54,7 @@ public class StoreController {
             @PathVariable UUID stoneId,
             @RequestBody Purchase.Request items
     ) {
-        Purchase.Response purchaseItems = storeService.purchaseItems(user.getId(), stoneId, items.getItemIds());
+        Purchase.Response purchaseItems = storeService.purchaseProducts(user.getId(), stoneId, items.getItemIds());
         return APIBody.of(HttpStatus.OK.value(), "아이템 구매 성공", purchaseItems);
     }
 

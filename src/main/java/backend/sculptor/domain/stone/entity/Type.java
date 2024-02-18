@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Item extends Product{
+public class Type extends Product{
 }

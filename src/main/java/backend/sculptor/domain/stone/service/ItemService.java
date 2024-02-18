@@ -2,24 +2,37 @@ package backend.sculptor.domain.stone.service;
 
 import backend.sculptor.domain.stone.entity.Item;
 import backend.sculptor.domain.stone.entity.StoneItem;
+import backend.sculptor.domain.stone.repository.BaseProductRepository;
+import backend.sculptor.domain.stone.repository.BaseStoneProductRepository;
 import backend.sculptor.domain.stone.repository.ItemRepository;
 import backend.sculptor.domain.stone.repository.StoneItemRepository;
 import backend.sculptor.domain.store.dto.WearItem;
-import backend.sculptor.global.exception.ErrorCode;
-import backend.sculptor.global.exception.NotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class ItemService {
+public class ItemService extends ProductService<Item, StoneItem> {
     private final ItemRepository itemRepository;
     private final StoneItemRepository stoneItemRepository;
+
+    public ItemService(ItemRepository itemRepository, StoneItemRepository stoneItemRepository) {
+        super(itemRepository, stoneItemRepository);
+        this.itemRepository = itemRepository;
+        this.stoneItemRepository = stoneItemRepository;
+    }
+
+    @Override
+    protected BaseProductRepository<Item> getBaseProductRepository() {
+        return itemRepository;
+    }
+
+    @Override
+    protected BaseStoneProductRepository<StoneItem> getBaseStoneProductRepository() {
+        return stoneItemRepository;
+    }
 
     @Transactional
     public WearItem.Response updateWearItem(UUID stoneId, List<UUID> itemIds) {
@@ -31,9 +44,9 @@ public class ItemService {
                     stoneItem.setIsWorn(toggleWear);
                     stoneItemRepository.save(stoneItem);
                     return WearItem.Response.StoneItem.builder()
-                                    .itemId(itemId)
-                                    .isWorn(toggleWear)
-                                    .build();
+                            .itemId(itemId)
+                            .isWorn(toggleWear)
+                            .build();
                 })
                 .toList();
 
@@ -41,20 +54,5 @@ public class ItemService {
                 .stoneId(stoneId)
                 .stoneItems(items)
                 .build();
-    }
-
-    public Boolean isPurchasedItem(UUID stoneId, UUID itemId){
-        return stoneItemRepository.findByStoneIdAndItemId(stoneId, itemId).isPresent();
-    }
-
-    public List<Item> getItemsById(List<UUID> itemsId) {
-        return itemsId.stream()
-                .map(this::getItemById)
-                .collect(Collectors.toList());
-    }
-
-    public Item getItemById(UUID itemId) {
-        return itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ITEM_NOT_FOUND.getMessage()));
     }
 }

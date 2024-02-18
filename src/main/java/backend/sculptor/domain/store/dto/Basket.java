@@ -17,10 +17,19 @@ public final class Basket {
     public static final class Response {
         private UUID stoneId;
         private List<Item> items;
+        private List<Type> types;
 
         @Getter
         @Builder
         public static final class Item {
+            private UUID id;
+            private Integer price;
+            private Boolean isPurchased;
+        }
+
+        @Getter
+        @Builder
+        public static final class Type {
             private UUID id;
             private Integer price;
             private Boolean isPurchased;
