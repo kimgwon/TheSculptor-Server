@@ -1,7 +1,6 @@
 package backend.sculptor.domain.store.controller;
 
 import backend.sculptor.domain.stone.entity.Item;
-import backend.sculptor.domain.stone.entity.StoneItem;
 import backend.sculptor.domain.stone.service.ItemService;
 import backend.sculptor.domain.store.dto.*;
 import backend.sculptor.domain.store.service.StoreService;
@@ -28,13 +27,14 @@ public class StoreController {
         return APIBody.of(HttpStatus.OK.value(), "조각상 조회 성공", storeStones);
     }
 
-    @PatchMapping("/stones/{stoneId}/items")
-    public APIBody<WearItem.Response> updateWearItem(
+    @PatchMapping("/stones/{stoneId}/type")
+    public APIBody<WearType.Response> updateWearType(
+            @CurrentUser SessionUser user,
             @PathVariable UUID stoneId,
-            @RequestBody WearItem.Request items
+            @RequestParam UUID typeId
     ) {
-        WearItem.Response wearItems = itemService.updateWearItem(stoneId, items.getItemIds());
-        return APIBody.of(HttpStatus.OK.value(), "돌 아이템 착용 변경 성공", wearItems);
+        WearType.Response wearType = itemService.updateWearType(user.getId(), stoneId, typeId);
+        return APIBody.of(HttpStatus.OK.value(), "돌 원석 착용 변경 성공", wearType);
     }
 
 

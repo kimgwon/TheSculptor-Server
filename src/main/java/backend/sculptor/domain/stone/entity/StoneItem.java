@@ -22,8 +22,4 @@ public class StoneItem {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name="stone_id")
     private Stone stone;
-
-    @Setter
-    @Builder.Default
-    private Boolean isWorn = false;
 }
