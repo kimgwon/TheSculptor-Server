@@ -108,16 +108,19 @@ public class StoreController {
     }
 
     //user가 가진 stone의 id -> stone_item 에서 검색 -> item_id로 item 테이블에 id,name,price
-    @GetMapping("/users/items")
-    public APIBody<?> getUsersItems(@CurrentUser SessionUser user) {
+    // -> stone의 item 조회
+    @GetMapping("/stones/{stoneId}/items")
+    public APIBody<Map<String, List<StoreItemDTO>>> getStoneItems(
+            @CurrentUser SessionUser user,
+            @PathVariable UUID stoneId) {
         if (user == null) {
             return APIBody.of(401, "인증되지 않은 사용자입니다.", null);
         }
         try {
-            List<StoreItemDTO> userItems = storeService.findUserItems(user.getId());
+            List<StoreItemDTO> stoneItems = storeService.findStoneItems(stoneId);
             Map<String, List<StoreItemDTO>> data = new HashMap<>();
-            data.put("userItems", userItems);
-            return APIBody.of(200, "사용자가 구매한 아이템 조회 성공", data);
+            data.put("items", stoneItems);
+            return APIBody.of(200, "해당 돌이 구매한 아이템 조회 성공", data);
         } catch (Exception e) {
             System.out.println("e.getMessage() = " + e.getMessage());
             return APIBody.of(500, "서버 내부 오류", null);
@@ -125,7 +128,7 @@ public class StoreController {
     }
 
     @GetMapping("/stones/{stoneId}")
-    public ResponseEntity<APIBody<Object>> showStoneItems(@CurrentUser SessionUser user,
+    public ResponseEntity<APIBody<Object>> showStoneWornItem(@CurrentUser SessionUser user,
                                                           @PathVariable("stoneId") UUID stoneId) {
         APIBody<Object> response = null;
         if (user == null) {
@@ -133,11 +136,9 @@ public class StoreController {
             return ResponseEntity.badRequest().body(response);
         }
         try {
-            List<StoreItemDTO> stoneItems = storeService.findStoneItems(stoneId);
-            Map<String, List<StoreItemDTO>> data = new HashMap<>();
-            data.put("stoneItems", stoneItems);
+            StoreItemDTO stoneWornItem = storeService.findStoneWornType(user.getId(), stoneId);
 
-            return ResponseEntity.ok(APIBody.of(200, "조각상이 착용중인 아이템 조회 성공", data));
+            return ResponseEntity.ok(APIBody.of(200, "조각상이 착용중인 원 조회 성공", stoneWornItem));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(APIBody.of(500, "서버 에러: " + e.getMessage(), null));
         }
