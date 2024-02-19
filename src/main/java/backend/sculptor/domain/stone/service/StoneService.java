@@ -262,7 +262,7 @@ public class StoneService {
 
         // 조건을 만족하는 경우, 돌 상태 업데이트 및 포인트 차감
         stone.setStatus(StoneStatus.BASIC);
-        stone.updatePowder(mossRemovalCost);
+        stone.updatePowder(-mossRemovalCost);
 
         stone.setLastManualChange(LocalDateTime.now());
         stoneRepository.save(stone);
@@ -284,7 +284,7 @@ public class StoneService {
         }
 
         stone.setStatus(StoneStatus.BASIC);
-        stone.updatePowder(crackRepairCost);
+        stone.updatePowder(-crackRepairCost);
         stone.setLastManualChange(LocalDateTime.now()); // 마지막 수동 변경 시간 기록
         stoneRepository.save(stone);
     }

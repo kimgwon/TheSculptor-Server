@@ -179,4 +179,19 @@ public class StoreService {
                 .map(this::convertToStoreItemDTO) // StoneItem을 StoreItemDTO로 변환
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public StoreItemDTO findStoneWornType(UUID userId, UUID stoneId) {
+        Stone stone = stoneService.getStoneByUserIdAndStoneId(userId, stoneId);
+        Item wornType = stone.getType();
+
+        if (wornType == null)
+            return null;
+
+        return StoreItemDTO.builder()
+                .itemId(wornType.getId())
+                .itemName(wornType.getItemName())
+                .itemPrice(wornType.getItemPrice())
+                .build();
+    }
 }
