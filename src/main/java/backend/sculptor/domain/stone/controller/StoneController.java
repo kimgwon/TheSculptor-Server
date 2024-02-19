@@ -12,6 +12,7 @@ import backend.sculptor.global.oauth.annotation.CurrentUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class StoneController {
             List<StoneListDTO> stones = stoneService.getStonesByCategory(user.getId(), category);
             if (stones.isEmpty()){
                 //조회된 데이터가 없는 경우
-                return APIBody.of(404,"조회된 돌 정보가 없습니다.", null);
+                return APIBody.of(200,"조회된 돌 정보가 없습니다.", Collections.emptyList());
             }
             return APIBody.of(200, "돌 정보 조회 성공", stones);
 
