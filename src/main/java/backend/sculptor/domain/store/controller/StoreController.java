@@ -43,7 +43,7 @@ public class StoreController {
     }
 
 
-    @GetMapping("/stones/{stoneId}/basket")
+    @PostMapping("/stones/{stoneId}/basket")
     public APIBody<Basket.Response> getStoreBasket(
             @CurrentUser SessionUser user,
             @PathVariable UUID stoneId,
