@@ -184,6 +184,16 @@ public class StoneService {
         return stone;
     }
 
+    public Stone getStoneFirstCreated(UUID userId) {
+        List<Stone> stones = stoneRepository.findByUsersIdOrderByCreatedAtAsc(userId);
+
+        if (stones.isEmpty()) {
+            return null;
+        } else {
+            return stones.get(0);
+        }
+    }
+
     //돌 상태 변화 감지 로직
     @Transactional
     public void updateStoneStatusBasedOnAchieves(UUID stoneId) {

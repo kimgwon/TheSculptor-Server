@@ -39,11 +39,22 @@ public class HomeController {
             Stone representStone = user.getRepresentStone();
 
             if (representStone==null) {
+                Stone stone = stoneService.getStoneFirstCreated(currentUser.getId());
+
+                if (stone==null){
+                    return APIBody.of(200, "대표 돌 및 생성된 돌이 없습니다.",
+                            UserRepresentStone.builder()
+                                    .id(user.getId())
+                                    .name(user.getName())
+                                    .stone(null)
+                                    .build());
+                }
+
                 return APIBody.of(200, "대표 돌이 없습니다.",
                         UserRepresentStone.builder()
                                 .id(user.getId())
                                 .name(user.getName())
-                                .stone(null)
+                                .stone(stoneService.convertToUserRepresenstStone(stone))
                                 .build());
             }
 

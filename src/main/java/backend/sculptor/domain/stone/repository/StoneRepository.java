@@ -17,6 +17,8 @@ public interface StoneRepository extends JpaRepository<Stone, UUID> {
 
     Optional<Stone> findByUsersIdAndId(UUID userId, UUID stoneId);
 
+    List<Stone> findByUsersIdOrderByCreatedAtAsc(UUID userId);
+
     //돌 중복 검사
     Optional<Stone> findByUsersIdAndStoneNameAndCategoryAndStoneGoalAndStartDate(UUID userId, String stoneName, Category category, String stoneGoal, LocalDateTime startDate);
 
